@@ -10,12 +10,7 @@ $(document).on('click', '.iv-select-options option', function(e) {
     if ( value_el.iv_isMultiple() ) {
 
     } else {
-        text_el.html(
-            '<div class="iv-selected-item w3-card w3-cell w3-blue-gray w3-round">' +
-            '<span class="w3-padding-small">' + target_el.text() + 
-            '&nbsp;</span><i class="fas fa-times iv-del-item w3-red w3-padding-small w3-hover-black"' + 
-            'style="cursor:pointer;border-bottom-left-radius: 4px;border-top-left-radius: 4px;"></i></div>'
-        );
+        text_el.html(addIvItem(target_el.text()));
         value_el.val(target_el.val());
         search_el.val('');
         value_el.trigger('change');
@@ -25,6 +20,15 @@ $(document).on('click', '.iv-select-options option', function(e) {
         target_el.parent().find('option').not(e.target).prop("selected", false);    
     }
 });
+
+function addIvItem(item_text) {
+    return( 
+        '<div class="iv-selected-item w3-card w3-cell w3-blue-gray w3-round">' +
+        '<span class="w3-padding-small">' + item_text + 
+        '&nbsp;</span><i class="fas fa-times iv-del-item w3-red w3-padding-small w3-hover-black"' + 
+        'style="cursor:pointer;border-bottom-left-radius: 4px;border-top-left-radius: 4px;"></i></div>'
+    )
+}
 
 $(document).on( 'keyup', '.iv-select-search', function(e) {
     var target = $(e.target);
@@ -253,10 +257,13 @@ $.fn.extend({
             new_option = new_option + $(this)[0].outerHTML;
         });
         if ( this.attr('name') !== undefined ) name = 'name="' + this.attr('name') + '"';
-        var iv_text_el = '<div class="iv-select-text w3-display-container w3-padding ' + text_class + '" style="' + text_style + '">' + value_text + '</div>';
+        var iv_text_el = '<div class="iv-select-text w3-display-container w3-padding ' + text_class + 
+                         '" style="' + text_style + '">' + addIvItem(value_text) + '</div>';
         var iv_search_el = '<input type="text" class="iv-select-search ' + search_class +
-                         '" autocomplete="off" style="display:none" placeholder="' + placeholder + '" style="' + search_style + '">';
-        var iv_value_el = '<input ' + id + ' type="hidden" ' + name + ' class="iv-select-value ' + value_class + '" value="' + value + '">';
+                           '" autocomplete="off" style="display:none" placeholder="' + placeholder + 
+                           '" style="' + search_style + '">';
+        var iv_value_el = '<input ' + id + ' type="hidden" ' + name + ' class="iv-select-value ' + value_class + 
+                          '" value="' + value + '">';
         this.replaceWith( 
             '<div class="iv-select ' + container_class + '">' + iv_text_el + iv_search_el + iv_value_el + 
             '<div class="iv-select-options ' + options_container_class + '" style="display:none;' + options_container_style + '">' + 
