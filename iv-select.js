@@ -5,6 +5,7 @@ $(document).on('click', '.iv-select-text', function (e) {
 $(document).on('click', '.iv-select-options option', function (e) {
     var target_el = $(e.target);
     var value_el = target_el.parent().parent().find('.iv-select-value');
+    var search_el = target_el.parent().parent().find('.iv-select-search');
     if (value_el.prop('multiple') === true)  {
         var current_value = value_el.val();
         if ( ! Array.isArray(current_value) ) {
@@ -15,14 +16,18 @@ $(document).on('click', '.iv-select-options option', function (e) {
     } else {
         value_el.val(target_el.val());
     }
+    if ( target_el.data('iv_closeAfterClick') ) {
+        target_el.parent().hide(200);
+        target_el.parent().parent().find('input.iv-select-search').hide(200);
+    }
+    search_el.val('');
 });
 
 function addIvItem(item_text) {
     return (
-        '<div class="iv-selected-item w3-card w3-cell w3-blue-gray w3-round">' +
-        '<span class="w3-padding-small">' + item_text +
-        '&nbsp;</span><i class="fas fa-times iv-del-item w3-red w3-padding-small w3-hover-black"' +
-        'style="cursor:pointer;border-bottom-left-radius: 4px;border-top-left-radius: 4px;"></i></div>'
+        `<div class="iv-selected-item w3-card w3-cell w3-blue-gray w3-round"><span class="w3-padding-small">
+        ${item_text}&nbsp;</span><i class="fas fa-times iv-del-item w3-red w3-padding-small w3-hover-black"
+        style="cursor:pointer;border-bottom-left-radius: 4px;border-top-left-radius: 4px;"></i></div>`
     )
 }
 
@@ -32,7 +37,7 @@ $(document).on('keyup', '.iv-select-search', function (e) {
     ivSelectDropDown(target);
     var search = target.val();
     target.nextAll('div.iv-select-options').children('option').filter(function () {
-        if ($(this).text().indexOf(search) > -1) {
+        if ($(this).text().toLowerCase().indexOf(search.toLowerCase()) > -1) {
             $(this).show();
         } else {
             $(this).hide();
@@ -52,9 +57,6 @@ $(document).on('click', function () {
     ) {
         $('.iv-select-options').hide(200);
         $('.iv-select-search').hide(200);
-        $('.iv-select-value').each(function () {
-            if ($(this).data('iv_keyup') == true) $(this).iv_hasValidValue();
-        });
     }
 });
 
@@ -93,6 +95,7 @@ function ivSelectDropDown(iv_input, clear_filter = true, auto_hide = false) {
     var search_el = iv_input.next('input.iv-select-search');
     var options = options_container.children('option');
     var iv_container = iv_input.parent('div.iv-select');
+    setTimeout(function() { search_el.focus() }, 100);
     $('.iv-select-text').nextAll('div.iv-select-options').not(options_container).hide();
     if (clear_filter) options.show();
     if (options_container.is(':hidden')) {
@@ -154,27 +157,6 @@ function ivSelectDropDown(iv_input, clear_filter = true, auto_hide = false) {
 })(jQuery);
 
 $.fn.extend({
-    iv_setValue: function (value) {
-        if (!this.hasClass('iv-select-value')) return;
-        if (this.prop('multiple') === true) {
-            if (!Array.isArray(value)) return;
-        } else {
-            if (Array.isArray(value)) return;
-        }
-        var iv_text = this.prevAll('input.iv-select-text');
-        var options_container = this.nextAll('div.iv-select-options');
-        var target_option = options_container.find('option[value="' + value + '"]');
-        if (target_option.length != 0) {
-            options_container.find('option').prop("selected", false);
-            target_option.prop("selected", true);
-            iv_text.val(target_option.text());
-            this.val(target_option.val());
-        } else {
-            options_container.find('option').prop("selected", false);
-            iv_text.val('');
-            this.val('');
-        }
-    },
     iv_updateOptions: function (new_options) {
         if (!this.hasClass('iv-select-value')) return;
         var options_container = this.nextAll('div.iv-select-options');
@@ -226,29 +208,7 @@ $.fn.extend({
     },
     iv_textEl: function () {
         if (!this.hasClass('iv-select-value')) return false;
-        return this.prevAll('input.iv-select-text');
-    },
-    iv_hasValidValue: function () {
-        if (!this.hasClass('iv-select-value')) return false;
-        var check = false;
-        var text_el = this.iv_textEl();
-        var options = this.nextAll('div.iv-select-options').children('option');
-        options.each(function () {
-            if (text_el.val() == $(this).text()) {
-                check = true;
-            }
-        });
-        if (!check) {
-            if (text_el.val() != '') {
-                this.iv_setValue(options.filter(function () {
-                    if ($(this).text().indexOf(text_el.val()) > -1) {
-                        return $(this);
-                    }
-                }).first().val());
-            } else {
-                this.iv_setValue('');
-            }
-        }
+        return this.prevAll('div.iv-select-text');
     },
     iv_selectConvert: function (
         {
@@ -264,9 +224,12 @@ $.fn.extend({
             option_class = "w3-block w3-button w3-white w3-hover-blue w3-border-left w3-border-right w3-border-blue",
             option_style = "",
             keep_existing_class = 'toValue', // possible values: toText, toValue, toContainer
+            close_after_click = true
         } = {}
     ) {
+        if (this.length == 0) return;
         if (this[0].tagName != 'SELECT') return;
+        if (this.hasClass('iv-select-value')) return;
         var name = '';
         var existing_class = this.attr('class');
         if (existing_class !== undefined && existing_class != '') {
@@ -287,48 +250,43 @@ $.fn.extend({
             id = "id='" + this.attr('id') + "'";
         }
         const value = this.val();
-        var value_text = '';
-        var new_option = '';
         var options = this.children('option');
         var multiple;
-        var value_option = '';
         options.last().addClass('w3-border-bottom');
         options.each(function () {
             $(this).addClass(option_class);
             $(this).attr('style', option_style);
-            if (Array.isArray(value)) {
-                if (value.indexOf($(this).val()) != -1) {
-                    $(this).attr("selected", 'selected');
-                    value_text += addIvItem($(this).text());
-                    value_option += $(this)[0].outerHTML;
-                } else {
-                    $(this).prop("selected", false);
-                }
-            } else {
-                if ($(this).val() == value) {
-                    $(this).attr("selected", 'selected');
-                    value_text = addIvItem($(this).text());
-                    value_option += $(this)[0].outerHTML;
-                } else {
-                    $(this).prop("selected", false);
-                }
-            }
-            new_option = new_option + $(this)[0].outerHTML;
         });
-        if (value_text == '') value_text = '&nbsp;';
         if (this.prop('multiple') === true) multiple = 'multiple';
         if (this.attr('name') !== undefined) name = 'name="' + this.attr('name') + '"';
-        var iv_text_el = '<div class="iv-select-text w3-display-container w3-padding ' + text_class +
-            '" style="' + text_style + '">' + value_text + '</div>';
-        var iv_search_el = '<input type="text" class="iv-select-search ' + search_class +
-            '" autocomplete="off" style="display:none" placeholder="' + placeholder +
-            '" style="' + search_style + '">';
-        var iv_value_el = '<select ' + id + ' ' + name + ' class="iv-select-value ' + value_class +
-            '" value="' + value + '" ' + multiple + ' style="display:none">' + value_option + '</select>';
-        this.replaceWith(
-            '<div class="iv-select ' + container_class + '">' + iv_text_el + iv_search_el + iv_value_el +
-            '<div class="iv-select-options ' + options_container_class + '" style="display:none;' + options_container_style + '">' +
-            new_option + '</div>'
-        );
+        var iv_select = $('<div/>').attr({
+            class : 'iv-select ' + container_class,
+        });
+        var text_element = $('<div/>').attr({
+            class : 'iv-select-text w3-display-container w3-padding ' + text_class,
+            style : text_style,
+        });
+        var search_element = $('<input>').attr({
+            class : 'iv-select-search ' + search_class,
+            autocomplete : 'off',
+            style : 'display:none;' + search_style,
+            placeholder : placeholder
+        });
+        var value_element = $('<select>').attr({
+            id : (this.attr('id') !== undefined && this.attr('id') != '') ? this.attr('id') : null,
+            name : (this.attr('name') !== undefined) ? this.attr('name') : null,
+            style : 'display:none;',
+            class : 'iv-select-value ' + value_class, 
+            multiple : multiple
+        });
+        var options_element = $('<div/>').attr({
+            class : 'iv-select-options ' + options_container_class,
+            style : 'display:none;' + options_container_style,
+        });
+        options.data('iv_closeAfterClick', close_after_click);
+        options_element.append(options);
+        iv_select.append(text_element, search_element, value_element, options_element);
+        iv_select.find('select.iv-select-value').val(value);
+        this.replaceWith(iv_select);        
     }
 });
