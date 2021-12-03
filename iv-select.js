@@ -23,26 +23,46 @@ $(document).on('click', '.iv-select-options option', function (e) {
     search_el.val('');
 });
 
-function addIvItem(item_text) {
+function addIvItem(item_text, item_val) {
     return (
-        `<div class="iv-selected-item w3-card w3-cell w3-blue-gray w3-round"><span class="w3-padding-small">
+        `<div id="iv-item_${item_val}" class="iv-selected-item w3-card w3-cell w3-blue-gray w3-round"><span class="w3-padding-small">
         ${item_text}&nbsp;</span><i class="fas fa-times iv-del-item w3-red w3-padding-small w3-hover-black"
         style="cursor:pointer;border-bottom-left-radius: 4px;border-top-left-radius: 4px;"></i></div>`
     )
 }
+
+$(document).on('click', '.iv-del-item', function(e) {
+    var target_el = $(e.target);
+    var item_container = target_el.parent();
+    const item_array = item_container.attr('id').split('_');
+    var del_item = item_array[1];
+    var iv_value_el = target_el.parent().parent().nextAll('select.iv-select-value');
+    if (iv_value_el.prop('multiple') === true) {
+        var current_value = iv_value_el.val();
+        if (Array.isArray(current_value)) {
+            const index = current_value.indexOf(del_item);
+            if (index != -1) {
+                current_value.splice(index, 1);
+                iv_value_el.val(current_value)
+            } 
+        } else {
+            iv_value_el.val('');
+        }
+    }
+    item_container.remove();
+});
 
 $(document).on('keyup', '.iv-select-search', function (e) {
     var target = $(e.target);
     target.nextAll('input.iv-select-value').data('iv_keyup', true);
     ivSelectDropDown(target);
     var search = target.val();
-    target.nextAll('div.iv-select-options').children('option').filter(function () {
-        if ($(this).text().toLowerCase().indexOf(search.toLowerCase()) > -1) {
-            $(this).show();
-        } else {
-            $(this).hide();
-        }
-    });
+    var options = target.nextAll('div.iv-select-options').children('option');
+    options.removeClass('w3-border-bottom');
+    options.hide();
+    const result = options.filter(index => $(options[index]).text().toLowerCase().indexOf(search.toLowerCase()) > -1);
+    result.show();
+    result.last().addClass('w3-border-bottom');
 });
 
 $(document).on('click', function () {
@@ -122,13 +142,12 @@ function ivSelectDropDown(iv_input, clear_filter = true, auto_hide = false) {
         if ( this.prop('multiple') !== true ) {
             if ( Array.isArray(value) ) value = value[0];
         }
-        if ( value == '' ) value_text = '&nbsp;';
         options.each(function() {
             if (Array.isArray(value)) {
                 if (value.indexOf($(this).val()) != -1) {
                     $(this).removeClass('w3-white');
                     $(this).addClass('w3-light-gray');
-                    value_text += addIvItem($(this).text());
+                    value_text += addIvItem($(this).text(), $(this).val());
                     $(this).prop("selected", true);
                     value_option += $(this)[0].outerHTML;
                 } else {
@@ -140,7 +159,7 @@ function ivSelectDropDown(iv_input, clear_filter = true, auto_hide = false) {
                 if ($(this).val() == value) {
                     $(this).removeClass('w3-white');
                     $(this).addClass('w3-light-gray');
-                    value_text += addIvItem($(this).text());
+                    value_text += addIvItem($(this).text(), $(this).val());
                     $(this).prop("selected", true);
                     value_option += $(this)[0].outerHTML;
                 } else {
@@ -150,6 +169,7 @@ function ivSelectDropDown(iv_input, clear_filter = true, auto_hide = false) {
                 }
             }
         });
+        if ( value_text == '' ) value_text = '&nbsp;';
         this.empty().append(value_option);
         iv_text_el.empty().append(value_text);
         return( originalFn.apply(this, arguments) );
@@ -214,14 +234,14 @@ $.fn.extend({
         {
             placeholder = "برای جستجو تایپ نمایید",
             text_style = "",
-            text_class = "w3-input w3-border",
-            search_class = "w3-input w3-border w3-border-blue",
+            text_class = "w3-input w3-border w3-display-container w3-padding",
+            search_class = "w3-input w3-border-left w3-border-right",
             search_style = "",
             value_class = "",
             container_class = "",
             options_container_class = "",
             options_container_style = "",
-            option_class = "w3-block w3-button w3-white w3-hover-blue w3-border-left w3-border-right w3-border-blue",
+            option_class = "w3-block w3-button w3-white w3-hover-blue w3-border-left w3-border-right",
             option_style = "",
             keep_existing_class = 'toValue', // possible values: toText, toValue, toContainer
             close_after_click = true
@@ -238,16 +258,12 @@ $.fn.extend({
                     value_class += ' ' + existing_class;
                     break;
                 case 'toText':
-                    search_class += ' ' + existing_class;
+                    text_class += ' ' + existing_class;
                     break;
                 case 'toContainer':
                     container_class += ' ' + existing_class;
                     break;
             }
-        }
-        var id = '';
-        if (this.attr('id') !== undefined && this.attr('id') != '') {
-            id = "id='" + this.attr('id') + "'";
         }
         const value = this.val();
         var options = this.children('option');
@@ -263,7 +279,7 @@ $.fn.extend({
             class : 'iv-select ' + container_class,
         });
         var text_element = $('<div/>').attr({
-            class : 'iv-select-text w3-display-container w3-padding ' + text_class,
+            class : 'iv-select-text ' + text_class,
             style : text_style,
         });
         var search_element = $('<input>').attr({
