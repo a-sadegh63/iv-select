@@ -23,31 +23,25 @@ $(document).on('click', '.iv-select-options option', function (e) {
     search_el.val('');
 });
 
-function addIvItem(item_text, item_val) {
-    return (
-        `<div id="iv-item_${item_val}" class="iv-selected-item w3-card w3-cell w3-blue-gray w3-round"><span class="w3-padding-small">
-        ${item_text}&nbsp;</span><i class="fas fa-times iv-del-item w3-red w3-padding-small w3-hover-black"
-        style="cursor:pointer;border-bottom-left-radius: 4px;border-top-left-radius: 4px;"></i></div>`
-    )
-}
-
 $(document).on('click', '.iv-del-item', function(e) {
     var target_el = $(e.target);
     var item_container = target_el.parent();
-    const item_array = item_container.attr('id').split('_');
-    var del_item = item_array[1];
+    var del_item = item_container.data('iv_itemValue');
     var iv_value_el = target_el.parent().parent().nextAll('select.iv-select-value');
     if (iv_value_el.prop('multiple') === true) {
         var current_value = iv_value_el.val();
         if (Array.isArray(current_value)) {
             const index = current_value.indexOf(del_item);
+            console.log(item_container)
             if (index != -1) {
                 current_value.splice(index, 1);
                 iv_value_el.val(current_value)
             } 
         } else {
-            iv_value_el.val('');
+            iv_value_el.val([]);
         }
+    } else {
+        iv_value_el.val('');
     }
     item_container.remove();
 });
@@ -80,36 +74,6 @@ $(document).on('click', function () {
     }
 });
 
-//update iv select to selected option on document load
-$('.iv-select').each(function () {
-    var options_container = $(this).find('div.iv-select-options');
-    var iv_text_el = $(this).find('input.iv-select-text');
-    var iv_value_el = $(this).find('input.iv-select-value');
-    var clear_val = true;
-    if (options_container.find(":selected").length != 0) {
-        var selected_text = options_container.find(":selected").text();
-        var selected_value = options_container.find(":selected").val();
-        iv_text_el.text(selected_text);
-        iv_value_el.val(selected_value);
-        iv_value_el.trigger('change');
-        clear_val = false;
-    } else if (iv_value_el.val() != '') {
-        var options = options_container.children('option');
-        options.each(function () {
-            if (iv_value_el.val() == $(this).val()) {
-                $(this).prop("selected", true);
-                iv_text_el.text($(this).text());
-                iv_value_el.change();
-                clear_val = false;
-            }
-        });
-    }
-    if (clear_val) {
-        iv_text_el.val('');
-        iv_value_el.val('');
-    }
-});
-
 function ivSelectDropDown(iv_input, clear_filter = true, auto_hide = false) {
     var options_container = iv_input.nextAll('div.iv-select-options');
     var search_el = iv_input.next('input.iv-select-search');
@@ -131,13 +95,29 @@ function ivSelectDropDown(iv_input, clear_filter = true, auto_hide = false) {
     }
 }
 
+function addIvItem(item_text, item_val) {
+    var container_node = $('<div/>').attr({
+        class : 'iv-selected-item w3-card w3-cell w3-blue-gray w3-round'
+    });
+    container_node.data('iv_itemValue', item_val);
+    var text_node = $('<span/>').attr({
+        class : 'w3-padding-small'
+    });
+    text_node.html(item_text + '&nbsp;');
+    var btn_node = $('<i/>').attr({
+        class : 'fas fa-times iv-del-item w3-red w3-padding-small w3-hover-black',
+        style : 'cursor:pointer;border-bottom-left-radius:4px;border-top-left-radius:4px;'
+    });
+    return(container_node.append(text_node, btn_node));
+}
+
 (function ($) {
     var originalFn = $.fn.val;
     $.fn.val = function (value) {
         if ( ! this.hasClass('iv-select-value') || value === undefined ) return originalFn.apply(this, arguments);
         var options = this.nextAll('div.iv-select-options').children('option');
         var iv_text_el = this.prevAll('div.iv-select-text');
-        var value_text = '';
+        var value_text = [];
         var value_option = '';
         if ( this.prop('multiple') !== true ) {
             if ( Array.isArray(value) ) value = value[0];
@@ -147,7 +127,7 @@ function ivSelectDropDown(iv_input, clear_filter = true, auto_hide = false) {
                 if (value.indexOf($(this).val()) != -1) {
                     $(this).removeClass('w3-white');
                     $(this).addClass('w3-light-gray');
-                    value_text += addIvItem($(this).text(), $(this).val());
+                    value_text.push(addIvItem($(this).text(), $(this).val()));
                     $(this).prop("selected", true);
                     value_option += $(this)[0].outerHTML;
                 } else {
@@ -159,7 +139,7 @@ function ivSelectDropDown(iv_input, clear_filter = true, auto_hide = false) {
                 if ($(this).val() == value) {
                     $(this).removeClass('w3-white');
                     $(this).addClass('w3-light-gray');
-                    value_text += addIvItem($(this).text(), $(this).val());
+                    value_text.push(addIvItem($(this).text(), $(this).val()));
                     $(this).prop("selected", true);
                     value_option += $(this)[0].outerHTML;
                 } else {
@@ -169,7 +149,7 @@ function ivSelectDropDown(iv_input, clear_filter = true, auto_hide = false) {
                 }
             }
         });
-        if ( value_text == '' ) value_text = '&nbsp;';
+        if ( value_text.length === 0 ) value_text = '&nbsp;';
         this.empty().append(value_option);
         iv_text_el.empty().append(value_text);
         return( originalFn.apply(this, arguments) );
@@ -250,7 +230,6 @@ $.fn.extend({
         if (this.length == 0) return;
         if (this[0].tagName != 'SELECT') return;
         if (this.hasClass('iv-select-value')) return;
-        var name = '';
         var existing_class = this.attr('class');
         if (existing_class !== undefined && existing_class != '') {
             switch (keep_existing_class) {
@@ -274,7 +253,6 @@ $.fn.extend({
             $(this).attr('style', option_style);
         });
         if (this.prop('multiple') === true) multiple = 'multiple';
-        if (this.attr('name') !== undefined) name = 'name="' + this.attr('name') + '"';
         var iv_select = $('<div/>').attr({
             class : 'iv-select ' + container_class,
         });
