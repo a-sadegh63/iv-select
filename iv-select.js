@@ -1,4 +1,5 @@
 $(document).on('click', '.iv-select-text', function (e) {
+    console.log($(e.target).outerWidth())
     ivSelectDropDown($(e.target), true, false);
 });
 
@@ -78,16 +79,17 @@ function ivSelectDropDown(iv_input, clear_filter = true, auto_hide = false) {
     var options_container = iv_input.nextAll('div.iv-select-options');
     var search_el = iv_input.next('input.iv-select-search');
     var options = options_container.children('option');
-    var iv_container = iv_input.parent('div.iv-select');
     setTimeout(function() { search_el.focus() }, 100);
     $('.iv-select-text').nextAll('div.iv-select-options').not(options_container).hide();
     if (clear_filter) options.show();
     if (options_container.is(':hidden')) {
         search_el.show(200);
+        options_container.show();
         options_container.attr(
             'style',
-            'position:absolute;width:' + iv_container.width() + 'px;'
+            'position:absolute;width:' + iv_input.outerWidth() + 'px;'
         );
+        options_container.hide();
         options_container.show(200);
     } else if (auto_hide) {
         options_container.hide(200);
