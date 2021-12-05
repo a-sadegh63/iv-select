@@ -168,8 +168,8 @@ $.fn.extend({
         {
             name,
             placeholder = "برای جستجو تایپ نمایید",
-            input_class = "",
-            input_style = "",
+            text_el_class = "",
+            text_el_style = "",
             container_class = "",
             container_style = "",
             options_container_class = "",
@@ -183,14 +183,20 @@ $.fn.extend({
         var value = this.val();
         var iv_select_container = this.parent('div.iv-select');
         var cloned_iv = iv_select_container.clone();
-        cloned_iv.addClass(container_class);
-        cloned_iv.attr('style', container_style);
+        cloned_iv.attr({
+            class : 'iv-select ' + container_class,
+            style : container_style
+        });
         cloned_iv.children('input.iv-select-value').attr('name', name);
-        cloned_iv.children('input.iv-select-text').attr('style', input_style);
-        cloned_iv.children('input.iv-select-text').attr('placeholder', placeholder);
-        cloned_iv.children('input.iv-select-text').addClass(input_class);
-        cloned_iv.children('div.iv-select-options').addClass(options_container_class);
-        cloned_iv.children('div.iv-select-options').attr('style', options_container_style);
+        cloned_iv.children('input.iv-select-search').attr('placeholder', placeholder);
+        cloned_iv.children('input.iv-select-text').attr({
+            class : 'iv-select-text ' + text_el_class,
+            style : text_el_style
+        });
+        cloned_iv.children('div.iv-select-options').attr({
+            class : 'iv-select-options ' + options_container_class,
+            style : options_container_style
+        });
         if (remove_unselected) {
             cloned_iv.children('div.iv-select-options').children('option').filter(function () {
                 if ($(this).val() != value) {
