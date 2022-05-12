@@ -324,7 +324,11 @@ $.fn.extend({
             $.each( attributes, function( index, attribute ) {
                 var attr_name = attribute.name;
                 var attr_value = attribute.nodeValue;
-                value_element = $('<select>').attr({ [attr_name]: attr_value });
+                if ( value_element === undefined ) {
+                    value_element = $('<select>').attr({ [attr_name]: attr_value });
+                } else {
+                    value_element.attr({ [attr_name]: attr_value });
+                }
             });
             value_element.attr({
                 style: 'display:none;',
