@@ -157,6 +157,28 @@ $.fn.extend({
         var options_container = this.nextAll('div.iv-select-options');
         options_container.empty().append(new_options);
     },
+    iv_getOptions: function() {
+        if (!this.hasClass('iv-select-value')) return;
+        var options_container = this.nextAll('div.iv-select-options');
+        var option_nodes = options_container.children('option');
+        var option_html = '';
+        option_nodes.each( function() {
+            $(this).removeAttr('style');
+            $(this).removeAttr('class');
+            option_html = option_html + this.outerHTML;
+        });
+        return option_html;
+    },
+    iv_getValuesArray: function() {
+        if (!this.hasClass('iv-select-value')) return;
+        var options_container = this.nextAll('div.iv-select-options');
+        var option_nodes = options_container.children('option');
+        const opt_values = [];
+        option_nodes.each( function() {
+            opt_values.push(this.value);
+        });
+        return opt_values;
+    },
     iv_cloneSelect: function({
         name,
         id = "",
@@ -297,9 +319,14 @@ $.fn.extend({
                     placeholder: args.placeholder
                 });
             }
-            var value_element = $('<select>').attr({
-                id: (select_el.attr('id') !== undefined && select_el.attr('id') != '') ? select_el.attr('id') : null,
-                name: (select_el.attr('name') !== undefined) ? select_el.attr('name') : null,
+            var attributes = select_el[0].attributes;
+            var value_element;
+            $.each( attributes, function( index, attribute ) {
+                var attr_name = attribute.name;
+                var attr_value = attribute.nodeValue;
+                value_element = $('<select>').attr({ [attr_name]: attr_value });
+            });
+            value_element.attr({
                 style: 'display:none;',
                 class: 'iv-select-value ' + args.class_for_value,
                 multiple: multiple
