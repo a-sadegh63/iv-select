@@ -209,7 +209,7 @@ $.fn.extend({
             cloned_iv.children('select.iv-select-value').removeAttr('id');
         }
         cloned_iv.children('input.iv-select-search').attr('placeholder', placeholder);
-        cloned_iv.children('input.iv-select-text').attr({
+        cloned_iv.children('div.iv-select-text').attr({
             class: 'iv-select-text ' + text_el_class,
             style: text_el_style
         });
