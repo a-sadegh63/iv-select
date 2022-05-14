@@ -309,7 +309,7 @@ $.fn.extend({
             });
             var text_element = $('<div/>').attr({
                 class: 'iv-select-text ' + args.class_for_text,
-                style: 'min-width:200px;background-color:white;' + args.style_for_text,
+                style: 'min-width:max-content;background-color:white;' + args.style_for_text,
             });
             if (!args.no_search_element) {
                 var search_element = $('<input>').attr({
