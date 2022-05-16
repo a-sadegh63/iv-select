@@ -16,6 +16,7 @@ $(document).on('click', '.iv-select-options option', function(e) {
     } else {
         value_el.val(target_el.val());
     }
+    value_el.trigger('change');
     if (target_el.data('iv_closeAfterClick')) {
         target_el.parent().hide(200);
     }
@@ -41,6 +42,7 @@ $(document).on('click', '.iv-del-item', function(e) {
     } else {
         iv_value_el.val('');
     }
+    iv_value_el.trigger('change');
     iv_value_el.parent().find('.iv-select-options').hide(200);
     item_container.remove();
 });
@@ -146,8 +148,10 @@ function addIvItem(item_text, item_val) {
         if (value_text.length === 0) value_text = '&nbsp;';
         this.empty().append(value_option);
         iv_text_el.empty().append(value_text);
-        originalFn.apply(this, arguments)
-        this.trigger('change');
+        originalFn.apply(this, arguments);
+        // if ( value !== undefined ) {
+        //     this.trigger('change');
+        // }
     };
 })(jQuery);
 
@@ -309,7 +313,7 @@ $.fn.extend({
             });
             var text_element = $('<div/>').attr({
                 class: 'iv-select-text ' + args.class_for_text,
-                style: 'min-width:max-content;background-color:white;' + args.style_for_text,
+                style: 'min-width:200px;background-color:white;' + args.style_for_text,
             });
             if (!args.no_search_element) {
                 var search_element = $('<input>').attr({
@@ -347,6 +351,7 @@ $.fn.extend({
             }
             iv_select.append(text_element, value_element, options_element);
             iv_select.find('select.iv-select-value').val(value);
+            iv_select.find('select.iv-select-value').trigger('change');
             select_el.replaceWith(iv_select);
         });
     }
