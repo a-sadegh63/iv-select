@@ -146,8 +146,8 @@ function addIvItem(item_text, item_val) {
         if (value_text.length === 0) value_text = '&nbsp;';
         this.empty().append(value_option);
         iv_text_el.empty().append(value_text);
+        originalFn.apply(this, arguments)
         this.trigger('change');
-        return (originalFn.apply(this, arguments));
     };
 })(jQuery);
 
