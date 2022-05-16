@@ -11,8 +11,11 @@ $(document).on('click', '.iv-select-options option', function(e) {
         if (!Array.isArray(current_value)) {
             current_value = [current_value];
         }
-        current_value.push(target_el.val());
-        value_el.val(current_value);
+        const index = current_value.indexOf(target_el.val());
+        if (index == -1) {
+            current_value.push(target_el.val());
+            value_el.val(current_value);
+        }
     } else {
         value_el.val(target_el.val());
     }
