@@ -152,9 +152,6 @@ function addIvItem(item_text, item_val) {
         this.empty().append(value_option);
         iv_text_el.empty().append(value_text);
         originalFn.apply(this, arguments);
-        // if ( value !== undefined ) {
-        //     this.trigger('change');
-        // }
     };
 })(jQuery);
 
@@ -214,6 +211,11 @@ $.fn.extend({
             cloned_iv.children('select.iv-select-value').attr('id', id);
         } else {
             cloned_iv.children('select.iv-select-value').removeAttr('id');
+        }
+        if ( cloned_iv.children('select.iv-select-value').prop('multiple') === true ) {
+            cloned_iv.children('select.iv-select-value').children('option').each(function() {
+                $(this).attr('selected', true);
+            });
         }
         cloned_iv.children('input.iv-select-search').attr('placeholder', placeholder);
         cloned_iv.children('div.iv-select-text').attr({
