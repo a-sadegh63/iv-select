@@ -2,6 +2,22 @@ $(document).on('click', '.iv-select-text', function(e) {
     ivSelectDropDown($(e.target), true, false);
 });
 
+$(document).ready(function() {
+    $('.iv-select-value').on( 'invalid', function () {
+        var text_el = $(this).iv_textEl();
+        text_el.attr( 'title', this.validationMessage );
+        var position = text_el.offset();
+        var width = text_el.outerWidth();
+        if ( text_el.next('span.iv-tooltip').length == 0 ) {
+            text_el.after( 
+                $('<span style="position:absolute;background-color:#42414d;color:white;' + 
+                  'font-size:13px;padding:18px;left:' + position.left + 'px;width:' + width + 
+                  'px" class="iv-tooltip w3-round">' + this.validationMessage + '</span>') 
+            );
+        }
+    });
+});
+
 $(document).on('click', '.iv-select-options option', function(e) {
     var target_el = $(e.target);
     var value_el = target_el.parent().parent().find('.iv-select-value');
@@ -70,6 +86,7 @@ $(document).on('click', function() {
     ) {
         $('.iv-select-options').hide(200);
     }
+    if ( $('.iv-tooltip:hover').length == 0 ) $('.iv-tooltip').remove();
 });
 
 function ivSelectDropDown(iv_input, clear_filter = true, auto_hide = false) {
