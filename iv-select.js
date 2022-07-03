@@ -1,4 +1,5 @@
 $(document).on('click', '.iv-select-text', function(e) {
+    if ( $(e.target).next('.iv-select-value').prop('disabled') ) return;
     ivSelectDropDown($(e.target), true, false);
 });
 
@@ -17,6 +18,18 @@ $(document).ready(function() {
         }
     });
 });
+
+jQuery.propHooks.disabled = {
+    set: function ( iv_select, prop_value ) {
+        if ( $(iv_select).is_ivSelect() ) {
+            if ( prop_value ) {
+                $(iv_select).iv_textEl().css('background-color', '#d5d5d5');
+            } else {
+                $(iv_select).iv_textEl().css('background-color', 'white');
+            }
+        }
+    }
+};
 
 $(document).on('click', '.iv-select-options option', function(e) {
     var target_el = $(e.target);
@@ -44,9 +57,10 @@ $(document).on('click', '.iv-select-options option', function(e) {
 
 $(document).on('click', '.iv-del-item', function(e) {
     var target_el = $(e.target);
+    var iv_value_el = target_el.parent().parent().nextAll('select.iv-select-value');
+    if ( iv_value_el.prop('disabled') ) return;
     var item_container = target_el.parent();
     var del_item = item_container.data('iv_itemValue');
-    var iv_value_el = target_el.parent().parent().nextAll('select.iv-select-value');
     if (iv_value_el.prop('multiple') === true) {
         var current_value = iv_value_el.val();
         if (Array.isArray(current_value)) {
