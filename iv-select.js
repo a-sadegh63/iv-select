@@ -1,5 +1,6 @@
 $(document).on('click', '.iv-select-text', function(e) {
     if ( $(e.target).next('.iv-select-value').prop('disabled') ) return;
+    $('.iv-tooltip').remove();
     ivSelectDropDown($(e.target), true, false);
 });
 
@@ -100,7 +101,6 @@ $(document).on('click', function() {
     ) {
         $('.iv-select-options').hide(200);
     }
-    if ( $('.iv-tooltip:hover').length == 0 ) $('.iv-tooltip').remove();
 });
 
 function ivSelectDropDown(iv_input, clear_filter = true, auto_hide = false) {
