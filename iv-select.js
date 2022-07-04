@@ -101,6 +101,11 @@ $(document).on('click', function() {
     ) {
         $('.iv-select-options').hide(200);
     }
+    if ( $('.iv-tooltip:hover').length == 0 ) {
+        setTimeout(function() {
+            $('.iv-tooltip').remove();
+        }, 2000);          
+    }
 });
 
 function ivSelectDropDown(iv_input, clear_filter = true, auto_hide = false) {
@@ -347,6 +352,11 @@ $.fn.extend({
             var iv_select = $('<div/>').attr({
                 class: 'iv-select ' + args.class_for_container,
             });
+            var tabindex = select_el.attr('tabindex');
+            if ( tabindex !== 'undefined' && tabindex !== false ) {
+                iv_select.attr('tabindex', tabindex);
+                select_el.removeAttr('tabindex');
+            }
             var text_element = $('<div/>').attr({
                 class: 'iv-select-text ' + args.class_for_text,
                 style: 'min-width:200px;background-color:white;' + args.style_for_text,
