@@ -1,6 +1,5 @@
 $(document).on('click', '.iv-select-text', function(e) {
     if ( $(e.target).next('.iv-select-value').prop('disabled') ) return;
-    $('.iv-tooltip').remove();
     ivSelectDropDown($(e.target), true, false);
 });
 
@@ -9,30 +8,21 @@ const ivSelectOninvalid = async (iv_value_dom, err_message) => {
     text_el.attr( 'title', err_message );
     var position = text_el.offset();
     var width = text_el.outerWidth();
-    if ( text_el.next('span.iv-tooltip').length == 0 ) {
-        text_el.after( 
-            $('<span style="position:absolute;background-color:#42414d;color:white;' + 
-              'font-size:13px;padding:18px;left:' + position.left + 'px;width:' + width + 
-              'px" class="iv-tooltip w3-round">' + err_message + '</span>') 
-        );
+    if ( text_el.next('span.iv-tooltip').length != 0 ) {
+        text_el.next('span.iv-tooltip').remove();
     }
-}
-
-$(document).ready(function() {
-    $('.iv-select-value').on( 'invalid', function () {
-        var text_el = $(this).iv_textEl();
-        text_el.attr( 'title', this.validationMessage );
-        var position = text_el.offset();
-        var width = text_el.outerWidth();
-        if ( text_el.next('span.iv-tooltip').length == 0 ) {
-            text_el.after( 
-                $('<span style="position:absolute;background-color:#42414d;color:white;' + 
-                  'font-size:13px;padding:18px;left:' + position.left + 'px;width:' + width + 
-                  'px" class="iv-tooltip w3-round">' + this.validationMessage + '</span>') 
-            );
+    text_el.after( 
+        $('<span style="position:absolute;background-color:#42414d;color:white;' + 
+          'font-size:13px;padding:18px;left:' + position.left + 'px;width:' + width + 
+          'px" class="iv-tooltip w3-round">' + err_message + '</span>') 
+    );
+    $(iv_value_dom).on( 'invalid', function () {
+        var text_el = $(iv_value_dom).iv_textEl();
+        if ( text_el.next('span.iv-tooltip').length != 0 ) {
+            text_el.next('span.iv-tooltip').show();
         }
     });
-});
+}
 
 jQuery.propHooks.disabled = {
     set: function ( iv_select, prop_value ) {
@@ -117,7 +107,7 @@ $(document).on('click', function() {
     }
     if ( $('.iv-tooltip:hover').length == 0 ) {
         setTimeout(function() {
-            $('.iv-tooltip').remove();
+            $('.iv-tooltip').hide();
         }, 2000);          
     }
 });
