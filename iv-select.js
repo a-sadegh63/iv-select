@@ -4,6 +4,20 @@ $(document).on('click', '.iv-select-text', function(e) {
     ivSelectDropDown($(e.target), true, false);
 });
 
+const ivSelectOninvalid = async (iv_value_dom, err_message) => {
+    var text_el = $(iv_value_dom).iv_textEl();
+    text_el.attr( 'title', err_message );
+    var position = text_el.offset();
+    var width = text_el.outerWidth();
+    if ( text_el.next('span.iv-tooltip').length == 0 ) {
+        text_el.after( 
+            $('<span style="position:absolute;background-color:#42414d;color:white;' + 
+              'font-size:13px;padding:18px;left:' + position.left + 'px;width:' + width + 
+              'px" class="iv-tooltip w3-round">' + err_message + '</span>') 
+        );
+    }
+}
+
 $(document).ready(function() {
     $('.iv-select-value').on( 'invalid', function () {
         var text_el = $(this).iv_textEl();
@@ -397,7 +411,6 @@ $.fn.extend({
             }
             iv_select.append(text_element, value_element, options_element);
             iv_select.find('select.iv-select-value').val(value);
-            iv_select.find('select.iv-select-value').trigger('change');
             select_el.replaceWith(iv_select);
         });
     }
