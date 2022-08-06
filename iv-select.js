@@ -344,7 +344,7 @@ $.fn.extend({
                         break;
                 }
             }
-            const value = select_el.val();
+            var first_value = select_el.val();
             var options = select_el.children('option');
             var multiple;
             options.last().addClass('w3-border-bottom');
@@ -400,7 +400,10 @@ $.fn.extend({
                 options_element.append(search_element, options);
             }
             iv_select.append(text_element, value_element, options_element);
-            iv_select.find('select.iv-select-value').val(value);
+            if ( select_el.data('iv-init-value') !== undefined ) {
+                first_value = select_el.data('iv-init-value');
+            }
+            iv_select.find('select.iv-select-value').val(first_value);
             select_el.replaceWith(iv_select);
         });
     }
