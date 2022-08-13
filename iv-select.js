@@ -21,6 +21,9 @@ const ivSelectOninvalid = async (iv_value_dom, err_message) => {
         if ( text_el.next('span.iv-tooltip').length != 0 ) {
             text_el.next('span.iv-tooltip').show();
         }
+        $('html, body').animate({
+            scrollTop: text_el.offset().top
+        }, 100 );
     });
 }
 
@@ -108,7 +111,7 @@ $(document).on('click', function() {
     if ( $('.iv-tooltip:hover').length == 0 ) {
         setTimeout(function() {
             $('.iv-tooltip').hide();
-        }, 2000);          
+        }, 3000);          
     }
 });
 
