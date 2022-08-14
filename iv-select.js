@@ -21,9 +21,12 @@ const ivSelectOninvalid = async (iv_value_dom, err_message) => {
         if ( text_el.next('span.iv-tooltip').length != 0 ) {
             text_el.next('span.iv-tooltip').show();
         }
-        $('html, body').animate({
-            scrollTop: text_el.offset().top
-        }, 100 );
+        if ( text_el[0].getBoundingClientRect().bottom > window.innerHeight ) {
+            text_el[0].scrollIntoView(false);
+        }
+        if ( text_el[0].getBoundingClientRect().top < 0 ) {
+            text_el[0].scrollIntoView();
+        } 
     });
 }
 
