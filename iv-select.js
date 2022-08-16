@@ -300,15 +300,15 @@ $.fn.extend({
     },
     iv_selectConvert: function({
         placeholder = "برای جستجو تایپ نمایید",
-        style_for_text = "",
-        class_for_text = "w3-input w3-border",
+        text_el_class = "w3-input w3-border",
+        text_el_style = "",
         class_for_search = "w3-block",
         search_style = "",
         class_for_value = "",
-        class_for_container = "",
-        class_for_opts_container = "",
-        style_for_opts_container = "",
-        class_for_options = "w3-block w3-button w3-hover-blue w3-border-left w3-border-right",
+        container_class = "",
+        options_container_class = "",
+        options_container_style = "",
+        option_class = "w3-block w3-button w3-hover-blue w3-border-left w3-border-right",
         option_style = "",
         keep_existing_class = 'toValue', // possible values: toText, toValue, toContainer
         close_after_click = true,
@@ -318,15 +318,15 @@ $.fn.extend({
         this.each(function() {
             var args = {
                 placeholder,
-                style_for_text,
-                class_for_text,
+                text_el_style,
+                text_el_class,
                 class_for_search,
                 search_style,
                 class_for_value,
-                class_for_container,
-                class_for_opts_container,
-                style_for_opts_container,
-                class_for_options,
+                container_class,
+                options_container_class,
+                options_container_style,
+                option_class,
                 option_style,
                 keep_existing_class,
                 close_after_click,
@@ -343,10 +343,10 @@ $.fn.extend({
                         args.class_for_value += ' ' + existing_class;
                         break;
                     case 'toText':
-                        args.class_for_text += ' ' + existing_class;
+                        args.text_el_class += ' ' + existing_class;
                         break;
                     case 'toContainer':
-                        args.class_for_container += ' ' + existing_class;
+                        args.container_class += ' ' + existing_class;
                         break;
                 }
             }
@@ -355,12 +355,12 @@ $.fn.extend({
             var multiple;
             options.last().addClass('w3-border-bottom');
             options.each(function() {
-                $(this).addClass(args.class_for_options);
+                $(this).addClass(args.option_class);
                 $(this).attr('style', args.option_style);
             });
             if (select_el.prop('multiple') === true) multiple = 'multiple';
             var iv_select = $('<div/>').attr({
-                class: 'iv-select ' + args.class_for_container,
+                class: 'iv-select ' + args.container_class,
             });
             var tabindex = select_el.attr('tabindex');
             if ( tabindex !== 'undefined' && tabindex !== false ) {
@@ -368,8 +368,8 @@ $.fn.extend({
                 select_el.removeAttr('tabindex');
             }
             var text_element = $('<div/>').attr({
-                class: 'iv-select-text ' + args.class_for_text,
-                style: 'min-width:200px;background-color:white;' + args.style_for_text,
+                class: 'iv-select-text ' + args.text_el_class,
+                style: 'min-width:200px;background-color:white;' + args.text_el_style,
             });
             if (!args.no_search_element) {
                 var search_element = $('<input>').attr({
@@ -396,8 +396,8 @@ $.fn.extend({
                 multiple: multiple
             });
             var options_element = $('<div/>').attr({
-                class: 'iv-select-options ' + args.class_for_opts_container,
-                style: 'display:none;' + args.style_for_opts_container,
+                class: 'iv-select-options ' + args.options_container_class,
+                style: 'display:none;' + args.options_container_style,
             });
             options.data('iv_closeAfterClick', args.close_after_click);
             if (args.no_search_element) {
