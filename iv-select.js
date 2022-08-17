@@ -150,8 +150,8 @@ function addIvItem(item_text, item_val) {
     });
     text_node.html(item_text + '&nbsp;');
     var btn_node = $('<i/>').attr({
-        class: 'fas fa-times iv-del-item w3-red w3-padding-small w3-hover-black',
-        style: 'cursor:pointer;border-bottom-left-radius:4px;border-top-left-radius:4px;'
+        class: 'fas fa-times iv-del-item w3-red w3-padding-small w3-hover-black w3-round',
+        style: 'cursor:pointer;'
     });
     return (container_node.append(text_node, btn_node));
 }
