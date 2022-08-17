@@ -61,3 +61,4 @@ iv-select is a simple, light and fast jQuery replacement for html select boxes
 |                   | } = {}                                                                                |                                                     |
    
 ***Demo***  
+[demo](https://iranvba.com/iv_select/)
