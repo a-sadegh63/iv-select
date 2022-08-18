@@ -19,6 +19,8 @@ iv-select is a simple, light and fast jQuery replacement for html select boxes
 `$('#select-id').val(); //use jQuery native val function to get iv_select value`
 `$('#select-id').val('volvo'); //use jQuery native val function to get iv_select value`
 `$('#select-id').val(['volvo', 'saab']); //set value of a multiple HTML select`  
+3. **Initialize value**  
+to set initialize value (default value) for iv_select, you must have a data-iv-init-value attribute in the HTML select before converting it to iv_select.  
   
 ***Function Reference***  
 | function          | arguments                                                                             | return value                                        |
