@@ -31,7 +31,7 @@ to set initialize value (default value) for iv_select, you must have a data-iv-i
 | iv_cloneSelect    | {                                                                                     | jQuery object; cloned iv_select                     |
 |                   |   name,                                                                               |                                                     |
 |                   |   id = "",                                                                            |                                                     |
-|                   |   placeholder = "برای جستجو تایپ نمایید",                                             |                                                     |
+|                   |   placeholder = "Type to search",                                                     |                                                     |
 |                   |   text_el_class = "w3-input w3-border",                                               |                                                     |
 |                   |   text_el_style = "min-width:200px;background-color:white;",                          |                                                     |
 |                   |   container_class = "",                                                               |                                                     |
@@ -46,7 +46,7 @@ to set initialize value (default value) for iv_select, you must have a data-iv-i
 | is_ivSelect       | none                                                                                  | bool; specifies the selector is an iv_select or not |
 | iv_textEl         | none                                                                                  | jQuery object; text element of iv_select            |
 | iv_selectConvert  | {                                                                                     | void; converts selector to iv_select                |
-|                   |   placeholder = "برای جستجو تایپ نمایید",                                             |                                                     |
+|                   |   placeholder = "Type to search",                                                     |                                                     |
 |                   |   text_el_class = "w3-input w3-border",                                               |                                                     |
 |                   |   text_el_style = "min-width:200px;background-color:white;",                          |                                                     |
 |                   |   class_for_search = "w3-block",                                                      |                                                     |
