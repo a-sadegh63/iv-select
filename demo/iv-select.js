@@ -144,7 +144,7 @@ function addIvItem(item_text, item_val) {
         class: 'iv-selected-item w3-card w3-blue-gray w3-round w3-small'
     });
     container_node.data('iv_itemValue', item_val);
-    container_node.css('width', 'fit-content');
+    container_node.attr('style', 'width:fit-content;display:inline-block;margin-left:1px;margin-right:1px;');
     var text_node = $('<span/>').attr({
         class: 'w3-padding-small'
     });
@@ -407,7 +407,11 @@ $.fn.extend({
             }
             iv_select.append(text_element, value_element, options_element);
             if ( select_el.data('iv-init-value') !== undefined ) {
-                first_value = select_el.data('iv-init-value');
+                if (select_el.prop('multiple') === false) {
+                    first_value = select_el.data('iv-init-value');
+                } else {
+                    first_value = select_el.data('iv-init-value').split('|');
+                }
             }
             iv_select.find('select.iv-select-value').val(first_value);
             select_el.replaceWith(iv_select);
