@@ -232,7 +232,7 @@ $.fn.extend({
     iv_cloneSelect: function({
         name,
         id = "",
-        placeholder = "برای جستجو تایپ نمایید",
+        placeholder = "Type to search",
         text_el_class = "w3-input w3-border",
         text_el_style = "min-width:200px;background-color:white;",
         container_class = "",
@@ -299,7 +299,7 @@ $.fn.extend({
         return false;
     },
     iv_selectConvert: function({
-        placeholder = "برای جستجو تایپ نمایید",
+        placeholder = "Type to search",
         text_el_class = "w3-input w3-border",
         text_el_style = "",
         class_for_search = "w3-block",
