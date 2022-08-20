@@ -63,4 +63,5 @@ to set initialize value (default value) for iv_select, you must have a data-iv-i
 |                   | } = {}                                                                                |                                                     |
    
 ***Demo***  
-[demo](https://iranvba.com/iv_select/)
+<a href="https://iranvba.com/iv_select/" target="_blank">Official demo</a>  
+<a href="https://www.jqueryscript.net/form/enhance-select-searchable-iv.html" target="_blank">iv_select on jqueryscript</a>
