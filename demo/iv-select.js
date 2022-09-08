@@ -403,7 +403,11 @@ $.fn.extend({
             }
             iv_select.append(text_element, value_element, options_element);
             if ( select_el.data('iv-init-value') !== undefined ) {
-                first_value = select_el.data('iv-init-value');
+                if (select_el.prop('multiple') === false) {
+                    first_value = select_el.data('iv-init-value');
+                } else {
+                    first_value = select_el.data('iv-init-value').split('|');
+                }
             }
             iv_select.find('select.iv-select-value').val(first_value);
             select_el.replaceWith(iv_select);
