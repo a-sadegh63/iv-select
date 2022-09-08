@@ -369,7 +369,7 @@ $.fn.extend({
             }
             var text_element = $('<div/>').attr({
                 class: 'iv-select-text ' + args.text_el_class,
-                style: 'min-width:200px;background-color:white;' + args.text_el_style,
+                style: 'min-width:200px;background-color:white;cursor:pointer!important' + args.text_el_style,
             });
             if (!args.no_search_element) {
                 var search_element = $('<input>').attr({
@@ -380,15 +380,11 @@ $.fn.extend({
                 });
             }
             var attributes = select_el[0].attributes;
-            var value_element;
+            var value_element = $('<select>');
             $.each( attributes, function( index, attribute ) {
                 var attr_name = attribute.name;
                 var attr_value = attribute.nodeValue;
-                if ( value_element === undefined ) {
-                    value_element = $('<select>').attr({ [attr_name]: attr_value });
-                } else {
-                    value_element.attr({ [attr_name]: attr_value });
-                }
+                value_element.attr({ [attr_name]: attr_value });
             });
             value_element.attr({
                 style: 'display:none;',
@@ -407,11 +403,7 @@ $.fn.extend({
             }
             iv_select.append(text_element, value_element, options_element);
             if ( select_el.data('iv-init-value') !== undefined ) {
-                if (select_el.prop('multiple') === false) {
-                    first_value = select_el.data('iv-init-value');
-                } else {
-                    first_value = select_el.data('iv-init-value').split('|');
-                }
+                first_value = select_el.data('iv-init-value');
             }
             iv_select.find('select.iv-select-value').val(first_value);
             select_el.replaceWith(iv_select);
