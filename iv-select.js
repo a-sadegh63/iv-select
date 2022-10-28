@@ -140,6 +140,7 @@ function ivSelectDropDown(iv_input, clear_filter = true, auto_hide = false) {
 }
 
 function addIvItem(item_text, item_val) {
+    if ( item_text == '' ) item_text = '<i class="fas fa-frog"></i>';
     var container_node = $('<div/>').attr({
         class: 'iv-selected-item w3-card w3-blue-gray w3-round w3-small'
     });
@@ -396,6 +397,12 @@ $.fn.extend({
                 style: 'display:none;' + args.options_container_style,
             });
             options.data('iv_closeAfterClick', args.close_after_click);
+            options_element.append(
+                $('<option/>').attr({
+                    class: 'w3-hide',
+                    value: ''
+                })
+            );
             if (args.no_search_element) {
                 options_element.append(options);
             } else {
@@ -409,7 +416,11 @@ $.fn.extend({
                     first_value = select_el.data('iv-init-value').split('|');
                 }
             }
-            iv_select.find('select.iv-select-value').val(first_value);
+            if ( first_value ) {
+                iv_select.find('select.iv-select-value').val(first_value);
+            } else {
+                iv_select.find('select.iv-select-value').val('');
+            }
             select_el.replaceWith(iv_select);
         });
     }
