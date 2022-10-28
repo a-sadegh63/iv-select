@@ -62,6 +62,11 @@ to set initialize value (default value) for iv_select, you must have a data-iv-i
 |                   |   no_search_element = false                                                           |                                                     |
 |                   | } = {}                                                                                |                                                     |
    
+***history***  
+[7c41495](https://github.com/a-sadegh63/iv-select/commit/7c41495ee821a5be7c83ccdbfe16cd59e9b02d16)
+* empty value handling 
+I expect, the val() function always returns an empty string on the single HTML selects and an empty array on the multiple HTML selects  
+  
 ***Demo***  
 <a href="https://iranvba.com/iv_select/" target="_blank">Official demo</a>  
 <a href="https://www.jqueryscript.net/form/enhance-select-searchable-iv.html" target="_blank">iv_select on jqueryscript</a>
