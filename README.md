@@ -64,7 +64,7 @@ to set initialize value (default value) for iv_select, you must have a data-iv-i
    
 ***history***  
 [7c41495](https://github.com/a-sadegh63/iv-select/commit/7c41495ee821a5be7c83ccdbfe16cd59e9b02d16)
-* empty value handling 
+empty value handling : 
 I expect, the val() function always returns an empty string on the single HTML selects and an empty array on the multiple HTML selects  
   
 ***Demo***  
