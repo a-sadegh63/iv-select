@@ -140,7 +140,7 @@ function ivSelectDropDown(iv_input, clear_filter = true, auto_hide = false) {
 }
 
 function addIvItem(item_text, item_val) {
-    if ( item_text == '' ) item_text = '<i class="fas fa-frog"></i>';
+    if ( item_text == '' ) item_text = '<i class="fas fa-adjust"></i>';
     var container_node = $('<div/>').attr({
         class: 'iv-selected-item w3-card w3-blue-gray w3-round w3-small'
     });
