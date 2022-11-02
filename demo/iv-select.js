@@ -1,6 +1,10 @@
 $(document).on('click', '.iv-select-text', function(e) {
-    if ( $(e.target).next('.iv-select-value').prop('disabled') ) return;
-    ivSelectDropDown($(e.target), true, false);
+    var target_el = $(e.target);
+    if ( ! target_el.hasClass('iv-select-text') ) {
+        target_el = target_el.parent().parent();
+    }
+    if ( target_el.next('.iv-select-value').prop('disabled') ) return;
+    ivSelectDropDown( target_el, true );
 });
 
 const ivSelectOninvalid = async (iv_value_dom, err_message) => {
@@ -118,7 +122,7 @@ $(document).on('click', function() {
     }
 });
 
-function ivSelectDropDown(iv_input, clear_filter = true, auto_hide = false) {
+function ivSelectDropDown(iv_input, clear_filter = true) {
     var options_container = iv_input.nextAll('div.iv-select-options');
     var search_el = iv_input.next('input.iv-select-search');
     var options = options_container.children('option');
@@ -133,13 +137,14 @@ function ivSelectDropDown(iv_input, clear_filter = true, auto_hide = false) {
         });
         options_container.hide();
         options_container.show(200);
-    } else if (auto_hide) {
+    } else {
         options_container.hide(200);
     }
     $('div.iv-select-options').not(options_container).hide(200);
 }
 
 function addIvItem(item_text, item_val) {
+    if ( item_text == '' ) item_text = '<i class="fas fa-adjust"></i>';
     var container_node = $('<div/>').attr({
         class: 'iv-selected-item w3-card w3-blue-gray w3-round w3-small'
     });
@@ -234,7 +239,7 @@ $.fn.extend({
         id = "",
         placeholder = "Type to search",
         text_el_class = "w3-input w3-border",
-        text_el_style = "min-width:200px;background-color:white;",
+        text_el_style = "background-color:white;",
         container_class = "",
         container_style = "",
         options_container_class = "",
@@ -369,7 +374,7 @@ $.fn.extend({
             }
             var text_element = $('<div/>').attr({
                 class: 'iv-select-text ' + args.text_el_class,
-                style: 'min-width:200px;background-color:white;cursor:pointer!important' + args.text_el_style,
+                style: 'background-color:white;cursor:pointer!important' + args.text_el_style,
             });
             if (!args.no_search_element) {
                 var search_element = $('<input>').attr({
@@ -396,6 +401,12 @@ $.fn.extend({
                 style: 'display:none;' + args.options_container_style,
             });
             options.data('iv_closeAfterClick', args.close_after_click);
+            options_element.append(
+                $('<option/>').attr({
+                    class: 'w3-hide',
+                    value: ''
+                })
+            );
             if (args.no_search_element) {
                 options_element.append(options);
             } else {
@@ -409,7 +420,11 @@ $.fn.extend({
                     first_value = select_el.data('iv-init-value').split('|');
                 }
             }
-            iv_select.find('select.iv-select-value').val(first_value);
+            if ( first_value ) {
+                iv_select.find('select.iv-select-value').val(first_value);
+            } else {
+                iv_select.find('select.iv-select-value').val('');
+            }
             select_el.replaceWith(iv_select);
         });
     }
