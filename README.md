@@ -72,5 +72,5 @@ I expect, the val() function always returns an empty string on the single HTML s
 * the min-width property was removed from the iv-select text element    
   
 ***Demo***  
-<a href="https://iranvba.com/iv_select/" target="_blank">Official demo</a>  
-<a href="https://www.jqueryscript.net/form/enhance-select-searchable-iv.html" target="_blank">iv_select on jqueryscript</a>
+* <a href="https://iranvba.com/iv_select/" target="_blank">Official demo</a>  
+* <a href="https://www.jqueryscript.net/form/enhance-select-searchable-iv.html" target="_blank">iv_select on jqueryscript</a>
