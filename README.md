@@ -64,8 +64,12 @@ to set initialize value (default value) for iv_select, you must have a data-iv-i
    
 ***history***  
 [7c41495](https://github.com/a-sadegh63/iv-select/commit/7c41495ee821a5be7c83ccdbfe16cd59e9b02d16)
-empty value handling : 
+* empty value handling : 
 I expect, the val() function always returns an empty string on the single HTML selects and an empty array on the multiple HTML selects  
+
+[25aa5c0](https://github.com/a-sadegh63/iv-select/commit/25aa5c0939c491977fb11ba1d0935d8708865621)
+* clicking on the iv-select items opens the options container  
+* the min-width property was removed from the iv-select text element    
   
 ***Demo***  
 <a href="https://iranvba.com/iv_select/" target="_blank">Official demo</a>  
