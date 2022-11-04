@@ -68,7 +68,10 @@ to set initialize value (default value) for iv_select, you must have a data-iv-i
 
 [25aa5c0](https://github.com/a-sadegh63/iv-select/commit/25aa5c0939c491977fb11ba1d0935d8708865621)
 * clicking on the iv-select items opens the options container  
-* the min-width property was removed from the iv-select text element    
+* the min-width property was removed from the iv-select text element 
+
+[6ad80a4](https://github.com/a-sadegh63/iv-select/commit/6ad80a46cea7c3be3f14b5a741844f91047b42df)
+* change the disabled iv-select style to be more like other inputs on the disabled status  
   
 ***Demo***  
 * <a href="https://iranvba.com/iv_select/" target="_blank">Official demo</a>  
