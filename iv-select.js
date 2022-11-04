@@ -7,6 +7,27 @@ $(document).on('click', '.iv-select-text', function(e) {
     ivSelectDropDown( target_el, true );
 });
 
+function ivSelectDropDown(iv_input, clear_filter = true) {
+    var options_container = iv_input.nextAll('div.iv-select-options');
+    var search_el = iv_input.next('input.iv-select-search');
+    var options = options_container.children('option');
+    setTimeout(function() { search_el.focus() }, 100);
+    $('.iv-select-text').nextAll('div.iv-select-options').not(options_container).hide();
+    if (clear_filter) options.show();
+    if (options_container.is(':hidden')) {
+        options_container.show();
+        options_container.css({
+            position: 'absolute',
+            width: iv_input.outerWidth() + 'px'
+        });
+        options_container.hide();
+        options_container.show(200);
+    } else {
+        options_container.hide(200);
+    }
+    $('div.iv-select-options').not(options_container).hide(200);
+}
+
 const ivSelectOninvalid = async (iv_value_dom, err_message) => {
     var text_el = $(iv_value_dom).iv_textEl();
     text_el.attr( 'title', err_message );
@@ -38,7 +59,7 @@ jQuery.propHooks.disabled = {
     set: function ( iv_select, prop_value ) {
         if ( $(iv_select).is_ivSelect() ) {
             if ( prop_value ) {
-                $(iv_select).iv_textEl().css('background-color', '#d5d5d5');
+                $(iv_select).iv_textEl().css('background-color', '#f1f1f1');
             } else {
                 $(iv_select).iv_textEl().css('background-color', 'white');
             }
@@ -121,27 +142,6 @@ $(document).on('click', function() {
         }, 3000);          
     }
 });
-
-function ivSelectDropDown(iv_input, clear_filter = true) {
-    var options_container = iv_input.nextAll('div.iv-select-options');
-    var search_el = iv_input.next('input.iv-select-search');
-    var options = options_container.children('option');
-    setTimeout(function() { search_el.focus() }, 100);
-    $('.iv-select-text').nextAll('div.iv-select-options').not(options_container).hide();
-    if (clear_filter) options.show();
-    if (options_container.is(':hidden')) {
-        options_container.show();
-        options_container.css({
-            position: 'absolute',
-            width: iv_input.outerWidth() + 'px'
-        });
-        options_container.hide();
-        options_container.show(200);
-    } else {
-        options_container.hide(200);
-    }
-    $('div.iv-select-options').not(options_container).hide(200);
-}
 
 function addIvItem(item_text, item_val) {
     if ( item_text == '' ) item_text = '<i class="fas fa-adjust"></i>';
