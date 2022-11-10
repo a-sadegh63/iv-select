@@ -9,21 +9,31 @@ $(document).on('click', '.iv-select-text', function(e) {
 
 function ivSelectDropDown(iv_input, clear_filter = true) {
     var options_container = iv_input.nextAll('div.iv-select-options');
-    var search_el = iv_input.next('input.iv-select-search');
+    var search_el = iv_input.nextAll('input.iv-select-search');
     var options = options_container.children('option');
     setTimeout(function() { search_el.focus() }, 100);
     $('.iv-select-text').nextAll('div.iv-select-options').not(options_container).hide();
+    $('.iv-select-text').nextAll('input.iv-select-search').not(search_el).hide();
     if (clear_filter) options.show();
     if (options_container.is(':hidden')) {
         options_container.show();
+        var iv_input_pos = iv_input.position();
+        var search_el_height = search_el.outerHeight();
         options_container.css({
             position: 'absolute',
-            width: iv_input.outerWidth() + 'px'
+            width: iv_input.outerWidth() + 'px',
+            top: iv_input_pos.top + iv_input.outerHeight() + search_el_height
+        });
+        search_el.css({
+            width: iv_input.outerWidth() + 'px',
         });
         options_container.hide();
+        search_el.hide();
+        search_el.show(100);
         options_container.show(200);
     } else {
         options_container.hide(200);
+        search_el.hide(200);
     }
     $('div.iv-select-options').not(options_container).hide(200);
 }
@@ -89,6 +99,7 @@ $(document).on('click', '.iv-select-options option', function(e) {
         target_el.parent().hide(200);
     }
     search_el.val('');
+    search_el.hide(200);
 });
 
 $(document).on('click', '.iv-del-item', function(e) {
@@ -119,7 +130,7 @@ $(document).on('click', '.iv-del-item', function(e) {
 $(document).on('keyup', '.iv-select-search', function(e) {
     var target = $(e.target);
     var search = target.val();
-    var options = target.parent('div.iv-select-options').children('option');
+    var options = target.next('div.iv-select-options').children('option');
     options.removeClass('w3-border-bottom');
     options.hide();
     const result = options.filter(index => $(options[index]).text().toLowerCase().indexOf(search.toLowerCase()) > -1);
@@ -135,6 +146,7 @@ $(document).on('click', function() {
         $('.iv-select-search:hover').length == 0
     ) {
         $('.iv-select-options').hide(200);
+        $('.iv-select-search').hide(200);
     }
     if ( $('.iv-tooltip:hover').length == 0 ) {
         setTimeout(function() {
@@ -199,7 +211,7 @@ function addIvItem(item_text, item_val) {
                 }
             }
         });
-        if (value_text.length === 0) value_text = '&nbsp;';
+        if ( value_text.length === 0 ) value_text = '&nbsp;';
         this.empty().append(value_option);
         iv_text_el.empty().append(value_text);
         originalFn.apply(this, arguments);
@@ -235,7 +247,7 @@ $.fn.extend({
         return opt_values;
     },
     iv_cloneSelect: function({
-        name,
+        name = "",
         id = "",
         placeholder = "Type to search",
         text_el_class = "w3-input w3-border",
@@ -249,7 +261,7 @@ $.fn.extend({
         remove_unselected = true,
         close_after_click = true
     } = {}) {
-        if (!this.hasClass('iv-select-value')) return;
+        if (!this.hasClass('iv-select-value')) return;        
         var value = this.val();
         var iv_select_container = this.parent('div.iv-select');
         var cloned_iv = iv_select_container.clone();
@@ -257,8 +269,10 @@ $.fn.extend({
             class: 'iv-select ' + container_class,
             style: container_style
         });
-        cloned_iv.children('select.iv-select-value').attr('name', name);
-        if (id != '') {
+        if ( name != '' ) {
+            cloned_iv.children('select.iv-select-value').attr('name', name);
+        }
+        if ( id != '' ) {
             cloned_iv.children('select.iv-select-value').attr('id', id);
         } else {
             cloned_iv.children('select.iv-select-value').removeAttr('id');
@@ -380,7 +394,7 @@ $.fn.extend({
                 var search_element = $('<input>').attr({
                     class: 'iv-select-search ' + args.class_for_search,
                     autocomplete: 'off',
-                    style: args.search_style,
+                    style: "display:none;position:absolute; " + args.search_style,
                     placeholder: args.placeholder
                 });
             }
@@ -407,12 +421,12 @@ $.fn.extend({
                     value: ''
                 })
             );
+            options_element.append(options);
             if (args.no_search_element) {
-                options_element.append(options);
+                iv_select.append(text_element, value_element, options_element);
             } else {
-                options_element.append(search_element, options);
+                iv_select.append(text_element, value_element, search_element, options_element);
             }
-            iv_select.append(text_element, value_element, options_element);
             if ( select_el.data('iv-init-value') !== undefined ) {
                 if (select_el.prop('multiple') === false) {
                     first_value = select_el.data('iv-init-value');
