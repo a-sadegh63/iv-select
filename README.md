@@ -72,6 +72,9 @@ to set initialize value (default value) for iv_select, you must have a data-iv-i
 
 [6ad80a4](https://github.com/a-sadegh63/iv-select/commit/6ad80a46cea7c3be3f14b5a741844f91047b42df)
 * change the disabled iv-select style to be more like other inputs on the disabled status  
+
+[2a6ba24](https://github.com/a-sadegh63/iv-select/commit/2a6ba24813d7f5dd45933b98ec8e4549061c39f1)
+* search element positioning is changed, the search element is stuck on top of the options container when scrolling  
   
 ***Demo***  
 * <a href="https://iranvba.com/iv_select/" target="_blank">Official demo</a>  
