@@ -163,12 +163,12 @@ function addIvItem(item_text, item_val) {
     container_node.data('iv_itemValue', item_val);
     container_node.attr('style', 'width:fit-content;display:inline-block;margin-left:1px;margin-right:1px;');
     var text_node = $('<span/>').attr({
-        class: 'w3-padding-small'
+        style: 'padding:2px 8px;'
     });
     text_node.html(item_text + '&nbsp;');
     var btn_node = $('<button/>').attr({
-        class: 'iv-del-item w3-padding-small w3-hover-black w3-round w3-red w3-button',
-        style: 'cursor:pointer;font-weight:900'
+        class: 'iv-del-item w3-hover-black w3-round w3-red w3-button',
+        style: 'padding:2px 8px;cursor:pointer;font-weight:900'
     });
     btn_node.html('&times;');
     return (container_node.append(text_node, btn_node));
@@ -251,8 +251,8 @@ $.fn.extend({
         name = "",
         id = "",
         placeholder = "Type to search",
-        text_el_class = "w3-input w3-border",
-        text_el_style = "background-color:white;",
+        text_el_class = "w3-block w3-border",
+        text_el_style = "background-color:white;cursor:pointer!important;padding:7px 8px;",
         container_class = "",
         container_style = "",
         options_container_class = "",
@@ -320,7 +320,7 @@ $.fn.extend({
     },
     iv_selectConvert: function({
         placeholder = "Type to search",
-        text_el_class = "w3-input w3-border",
+        text_el_class = "w3-block w3-border",
         text_el_style = "",
         class_for_search = "w3-block",
         search_style = "",
@@ -389,7 +389,7 @@ $.fn.extend({
             }
             var text_element = $('<div/>').attr({
                 class: 'iv-select-text ' + args.text_el_class,
-                style: 'background-color:white;cursor:pointer!important;' + args.text_el_style,
+                style: 'background-color:white;cursor:pointer!important;padding:7px 8px;' + args.text_el_style,
             });
             if (!args.no_search_element) {
                 var search_element = $('<input>').attr({
