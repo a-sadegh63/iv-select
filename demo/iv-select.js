@@ -156,7 +156,7 @@ $(document).on('click', function() {
 });
 
 function addIvItem(item_text, item_val) {
-    if ( item_text == '' ) item_text = '<i class="fas fa-adjust"></i>';
+    if ( item_text == '' ) return '&nbsp;';
     var container_node = $('<div/>').attr({
         class: 'iv-selected-item w3-card w3-blue-gray w3-round w3-small'
     });
@@ -166,10 +166,11 @@ function addIvItem(item_text, item_val) {
         class: 'w3-padding-small'
     });
     text_node.html(item_text + '&nbsp;');
-    var btn_node = $('<i/>').attr({
-        class: 'fas fa-times iv-del-item w3-red w3-padding-small w3-hover-black w3-round',
-        style: 'cursor:pointer;'
+    var btn_node = $('<button/>').attr({
+        class: 'iv-del-item w3-padding-small w3-hover-black w3-round w3-red w3-button',
+        style: 'cursor:pointer;font-weight:900'
     });
+    btn_node.html('&times;');
     return (container_node.append(text_node, btn_node));
 }
 
@@ -388,13 +389,13 @@ $.fn.extend({
             }
             var text_element = $('<div/>').attr({
                 class: 'iv-select-text ' + args.text_el_class,
-                style: 'background-color:white;cursor:pointer!important' + args.text_el_style,
+                style: 'background-color:white;cursor:pointer!important;' + args.text_el_style,
             });
             if (!args.no_search_element) {
                 var search_element = $('<input>').attr({
                     class: 'iv-select-search ' + args.class_for_search,
                     autocomplete: 'off',
-                    style: "display:none;position:absolute; " + args.search_style,
+                    style: "display:none;position:absolute;" + args.search_style,
                     placeholder: args.placeholder
                 });
             }

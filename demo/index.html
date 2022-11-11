@@ -3,8 +3,6 @@
 
 <head>
 	<meta charset="utf-8">
-	<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css"
-		integrity="sha384-DyZ88mC6Up2uqS4h/KRgHuoeGwBcD4Ng9SiP4dIRy0EXTlnuz47vAwmeGwVChigm" crossorigin="anonymous">
 	<link href="https://www.w3schools.com/w3css/4/w3.css" rel="stylesheet" type="text/css">
 	<link href="style.css" rel="stylesheet" type="text/css">
 	<script src="https://code.jquery.com/jquery-3.6.0.min.js"
@@ -15,7 +13,7 @@
 <body style="background-color:#1d2a35;color:white;">
 
 	<h1 class="w3-padding">iv_select</h1>
-
+	<h2 class="w3-padding">iv-select is a simple, light and fast jQuery replacement for html select boxes</h2>
 	<div class="w3-container w3-padding w3-margin w3-border w3-round w3-row">
 		<h3>HTML select</h3>
 		<div class="w3-half">
@@ -99,11 +97,11 @@
 		</select>
 		<button id="validate" type="submit" class="w3-button w3-green w3-right w3-round">submit</button>
 	</form>
-
+	<div style="padding-bottom:128px;"></div>
 
 	<script>
 
-		$('#cars-2, #cars-6, #cars-7, #cars-4').iv_selectConvert( {text_el_style:'width:90%'} );
+		$('#cars-2, #cars-6, #cars-7, #cars-4').iv_selectConvert( {text_el_style:'width:80%!important;'} );
 		$('#cars-5').iv_selectConvert( {text_el_style:'width:300px'} );
 		$('#cars-4').val(['volvo', 'saab']);
 
