@@ -118,7 +118,6 @@
 
 		function validateElements(form) {
 			const matches = form.querySelectorAll("[data-customvalidity]");
-			console.log(matches)
 			var error = false;
 			matches.forEach(async (match) => {
 				var err_message = match.dataset.customvalidity;
