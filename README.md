@@ -76,6 +76,11 @@ to set initialize value (default value) for iv_select, you must have a data-iv-i
 [2a6ba24](https://github.com/a-sadegh63/iv-select/commit/2a6ba24813d7f5dd45933b98ec8e4549061c39f1)
 * search element positioning is changed, the search element is stuck on top of the options container when scrolling  
   
+[74c7a80](https://github.com/a-sadegh63/iv-select/commit/74c7a8034930ee7cccca27fd1882dab6aa53fbfd)
+* fix the iv-select validation function
+* change the iv-select tooltip style
+* fix HTML 5 validation when the iv-select is empty and is required
+  
 ***Demo***  
 * <a href="https://iranvba.com/iv_select/" target="_blank">Official demo</a>  
 * <a href="https://www.jqueryscript.net/form/enhance-select-searchable-iv.html" target="_blank">iv_select on jqueryscript</a>
