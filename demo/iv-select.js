@@ -17,7 +17,7 @@ function ivSelectDropDown(iv_input, clear_filter = true) {
     if (clear_filter) options.show();
     if (options_container.is(':hidden')) {
         options_container.show();
-        var iv_input_pos = iv_input.position();
+        var iv_input_pos = iv_input.offset();
         var search_el_height = search_el.outerHeight();
         options_container.css({
             position: 'absolute',
