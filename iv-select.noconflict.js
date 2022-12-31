@@ -22,7 +22,7 @@ function ivSelectDropDown(iv_input, clear_filter = true) {
         options_container.css({
             position: 'absolute',
             width: iv_input.outerWidth() + 'px',
-            top: iv_input_pos.top + iv_input.outerHeight() + search_el_height
+            // top: iv_input_pos.top + iv_input.outerHeight() + search_el_height
         });
         search_el.css({
             width: iv_input.outerWidth() + 'px',
