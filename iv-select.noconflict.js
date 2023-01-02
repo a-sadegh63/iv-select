@@ -10,27 +10,23 @@ jQuery(document).on('click', '.iv-select-text', function(e) {
 function ivSelectDropDown(iv_input, clear_filter = true) {
     var options_container = iv_input.nextAll('div.iv-select-options');
     var search_el = iv_input.nextAll('input.iv-select-search');
+    search_el.val('');
     var options = options_container.children('option');
     setTimeout(function() { search_el.focus() }, 100);
     jQuery('.iv-select-text').nextAll('div.iv-select-options').not(options_container).hide();
     jQuery('.iv-select-text').nextAll('input.iv-select-search').not(search_el).hide();
     if (clear_filter) options.show();
     if (options_container.is(':hidden')) {
-        options_container.show();
-        var iv_input_pos = iv_input.offset();
-        var search_el_height = search_el.outerHeight();
         options_container.css({
-            position: 'absolute',
             width: iv_input.outerWidth() + 'px',
-            // top: iv_input_pos.top + iv_input.outerHeight() + search_el_height
         });
         search_el.css({
             width: iv_input.outerWidth() + 'px',
         });
         options_container.hide();
         search_el.hide();
-        search_el.show(100);
-        options_container.show(200);
+        search_el.show( 100 );
+        options_container.show( 200 );
     } else {
         options_container.hide(200);
         search_el.hide(200);
@@ -401,7 +397,7 @@ jQuery.fn.extend({
                 var search_element = jQuery('<input>').attr({
                     class: 'iv-select-search ' + args.class_for_search,
                     autocomplete: 'off',
-                    style: "display:none;position:absolute;" + args.search_style,
+                    style: "display:none;position:inherit;" + args.search_style,
                     placeholder: args.placeholder
                 });
             }
@@ -419,7 +415,7 @@ jQuery.fn.extend({
             });
             var options_element = jQuery('<div/>').attr({
                 class: 'iv-select-options ' + args.options_container_class,
-                style: 'display:none;' + args.options_container_style,
+                style: 'display:none;position:inherit;' + args.options_container_style,
             });
             options.data('iv_closeAfterClick', args.close_after_click);
             options_element.append(
