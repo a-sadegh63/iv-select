@@ -82,5 +82,6 @@ to set initialize value (default value) for iv_select, you must have a data-iv-i
 * fix HTML 5 validation when the iv-select is empty and is required
   
 ***Demo***  
+* <a href="https://iranvba.com/iv-select-%d8%ac%d8%a7%db%8c%da%af%d8%b2%db%8c%d9%86-jquery-%d8%a8%d8%b1%d8%a7%db%8c-%d8%ac%d8%b9%d8%a8%d9%87-%d8%a7%d9%86%d8%aa%d8%ae%d8%a7%d8%a8-html/" target="_blank">iv-select on Iranvba.com (persian)</a> 
 * <a href="https://iranvba.com/iv_select/" target="_blank">Official demo</a>  
 * <a href="https://www.jqueryscript.net/form/enhance-select-searchable-iv.html" target="_blank">iv_select on jqueryscript</a>
