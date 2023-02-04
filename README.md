@@ -80,6 +80,9 @@ to set initialize value (default value) for iv_select, you must have a data-iv-i
 * fix the iv-select validation function
 * change the iv-select tooltip style
 * fix HTML 5 validation when the iv-select is empty and is required
+
+[7b7b053](https://github.com/a-sadegh63/iv-select/commit/7b7b053a75756a243e79fa663981461ae6f8072f)
+* change elements orders to fix absolute positioning
   
 ***Demo***  
 * <a href="https://iranvba.com/iv-select-%d8%ac%d8%a7%db%8c%da%af%d8%b2%db%8c%d9%86-jquery-%d8%a8%d8%b1%d8%a7%db%8c-%d8%ac%d8%b9%d8%a8%d9%87-%d8%a7%d9%86%d8%aa%d8%ae%d8%a7%d8%a8-html/" target="_blank">iv-select on Iranvba.com (persian)</a> 
