@@ -5,6 +5,10 @@
   border-bottom: hidden;
 }
 
+.iv-select-search:focus{
+  outline: none;
+}
+
 .iv-select-options {
   position:absolute;
   max-height: 200px;

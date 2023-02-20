@@ -1,6 +1,6 @@
 const iv_elements = {
     main_el: 0, //main element iv-select class
-    view_el: 1, //view element iv-select-veiw class
+    view_el: 1, //view element iv-select-view class
     text_el: 2, //text element iv-select-text class
     search_el: 3, //search element iv-select-search class
     value_el: 4, //value element iv-select-value class
@@ -9,7 +9,7 @@ const iv_elements = {
     delete_button: 7, //delete button element iv-del-button class
 };
 
-$(document).on('click', '.iv-select-veiw', function(e) {
+$(document).on('click', '.iv-select-view', function(e) {
     var target_el = $(e.target);
     var options_container = target_el.iv_findElement( iv_elements.options_el );
     var value_el = target_el.iv_findElement( iv_elements.value_el );
@@ -22,8 +22,8 @@ function ivSelectDropDown( options_container, search_el, clear_filter = true ) {
     search_el.val('');
     var options = options_container.children('option');
     setTimeout(function() { search_el.focus() }, 100);
-    $('.iv-select-text').nextAll('div.iv-select-options').not(options_container).hide();
-    $('.iv-select-text').nextAll('input.iv-select-search').not(search_el).hide();
+    $('div.iv-select-options').not(options_container).hide();
+    // $('input.iv-select-search').not(search_el).hide();
     if (clear_filter) options.show();
     options_container.toggle(200);
     $('div.iv-select-options').not(options_container).hide(200);
@@ -203,14 +203,23 @@ function addIvItem(item_text, item_val) {
                 }
             }
         });
-        if ( value_text.length === 0 ) value_text = '&nbsp;';
+        // if ( value_text.length === 0 ) value_text = '&nbsp;';
         if ( this.attr('required') ) {
             if ( value == '' ) {
                 this[0].setCustomValidity('Please fill out this field');
             }
         }
         this.empty().append(value_option);
-        iv_text_el.empty().append(value_text);
+        if ( Array.isArray(value_text) ) {
+            jQuery.each( value_text, function () {
+                if ( this instanceof Object && this !== null ) {
+                    console.log(typeof this)
+                    $(this).insertBefore( iv_text_el.children('.iv-select-search') );
+                }
+            });
+        } 
+        
+        // iv_text_el.empty().append(value_text);
         originalFn.apply(this, arguments);
     };
 })(jQuery);
@@ -323,7 +332,7 @@ $.fn.extend({
      * of all **iv_select** elements associated with the current element.
      *  find_what = {
             main_el: 0, //main element iv-select class
-            view_el: 1, //view element iv-select-veiw class
+            view_el: 1, //view element iv-select-view class
             text_el: 2, //text element iv-select-text class
             search_el: 3, //search element iv-select-search class
             value_el: 4, //value element iv-select-value class
@@ -340,14 +349,14 @@ $.fn.extend({
             case this.hasClass('iv-select') :
                 iv_element = this;
                 break;
-            case this.hasClass('iv-select-veiw') :
+            case this.hasClass('iv-select-view') :
                 iv_element = this.parent();
                 break;
             case this.hasClass('iv-select-text') :
                 iv_element = this.parent().parent();
                 break;
             case this.hasClass('iv-select-search') :
-                iv_element = this.parent().parent().parent();
+                iv_element = this.parent().parent();
                 break;
             case this.hasClass('iv-select-value') :
                 iv_element = this.parent();
@@ -368,26 +377,26 @@ $.fn.extend({
             case iv_elements.main_el :
                 return iv_element;
             case iv_elements.view_el :
-                return iv_element.children('.iv-select-veiw');
+                return iv_element.children('.iv-select-view');
             case iv_elements.text_el :
-                return iv_element.children('.iv-select-veiw').children('.iv-select-text');
+                return iv_element.children('.iv-select-view').children('.iv-select-text');
             case iv_elements.search_el :
-                return iv_element.children('.iv-select-veiw').children('.iv-select-search-container').children('.iv-select-search');
+                return iv_element.children('.iv-select-view').children('.iv-select-search');
             case iv_elements.value_el :
                 return iv_element.children('.iv-select-value');
             case iv_elements.options_el :
                 return iv_element.children('.iv-select-options');
             case iv_elements.search_container_el :
-                return iv_element.children('.iv-select-veiw').children('.iv-select-search-container');
+                return iv_element.children('.iv-select-view').children('.iv-select-search-container');
             case 'all' :
                 return {
                     main_el: iv_element,
-                    view_el: iv_element.children('.iv-select-veiw'),
-                    text_el: iv_element.children('.iv-select-veiw').children('.iv-select-text'),
-                    search_el: iv_element.children('.iv-select-veiw').children('.iv-select-search-container').children('.iv-select-search'),
+                    view_el: iv_element.children('.iv-select-view'),
+                    text_el: iv_element.children('.iv-select-view').children('.iv-select-text'),
+                    search_el: iv_element.children('.iv-select-view').children('.iv-select-search'),
                     value_el: iv_element.children('.iv-select-value'),
                     options_el: iv_element.children('.iv-select-options'),
-                    search_container_el: iv_element.children('.iv-select-veiw').children('.iv-select-search-container'),
+                    search_container_el: iv_element.children('.iv-select-view').children('.iv-select-search-container'),
                 };
         }
     },
@@ -479,9 +488,9 @@ $.fn.extend({
             });
             var text_element_container = $('<div/>');
             iv_select.css( {cursor:'pointer!important'} );
-            text_element_container.addClass( 'iv-select-veiw w3-row' );
+            text_element_container.addClass( 'iv-select-view w3-row w3-padding-small' );
             var text_element = $('<div/>').attr({
-                class: 'iv-select-text'
+                class: 'iv-select-text w3-col'
             });
             if ( args.text_el_style != '' ) {
                 text_element.attr( 'style', args.text_el_style );
@@ -493,19 +502,19 @@ $.fn.extend({
             text_element_container.append( text_element );
             if ( ! args.no_search_element ) {
                 var search_element = $('<input>').attr({
-                    class: 'iv-select-search w3-input',
+                    class: 'iv-select-search',
                     autocomplete: 'off',
-                    style: "border:none;width:auto;" + args.search_style,
+                    style: "border:none;" + args.search_style,
                     placeholder: args.placeholder
                 });
                 if ( class_for_search != '' ) {
                     search_element.addClass( args.class_for_search );
                 }
-                var search_el_container = $('<div/>');
-                search_el_container.addClass('iv-select-search-container w3-col');
-                search_el_container.css('width', 'auto');
-                search_el_container.append( search_element );
-                text_element_container.append( search_el_container );
+                // var search_el_container = $('<div/>');
+                // search_el_container.addClass('iv-select-search-container w3-col');
+                // search_el_container.css('width', 'auto');
+                // search_el_container.append( search_element );
+                text_element.append( search_element );
             } else {
                 text_element.css({width: '100%'});
                 iv_select.css({'min-width': '100px', padding:'7px 8px'});
