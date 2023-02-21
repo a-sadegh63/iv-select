@@ -145,7 +145,7 @@ $(document).on('click', function(e) {
 });
 
 function addIvItem(item_text, item_val) {
-    if ( item_text == '' ) return '&nbsp;';
+    if ( item_text == '' ) return '';
     var container_node = $('<div/>').attr({
         class: 'iv-selected-item w3-cell-row w3-col w3-card w3-blue-gray w3-round w3-small'
     });
@@ -213,7 +213,6 @@ function addIvItem(item_text, item_val) {
         if ( Array.isArray(value_text) ) {
             jQuery.each( value_text, function () {
                 if ( this instanceof Object && this !== null ) {
-                    console.log(typeof this)
                     $(this).insertBefore( iv_text_el.children('.iv-select-search') );
                 }
             });
@@ -356,7 +355,7 @@ $.fn.extend({
                 iv_element = this.parent().parent();
                 break;
             case this.hasClass('iv-select-search') :
-                iv_element = this.parent().parent();
+                iv_element = this.parent().parent().parent();
                 break;
             case this.hasClass('iv-select-value') :
                 iv_element = this.parent();
@@ -462,7 +461,7 @@ $.fn.extend({
             });
             if (select_el.prop('multiple') === true) multiple = 'multiple';
             var iv_select = $('<div/>').attr({
-                class: 'iv-select ' + args.container_class,
+                class: 'iv-select w3-round ' + args.container_class,
             });
             iv_select.css('position', 'relative');
             var tabindex = select_el.attr('tabindex');
@@ -502,7 +501,7 @@ $.fn.extend({
             text_element_container.append( text_element );
             if ( ! args.no_search_element ) {
                 var search_element = $('<input>').attr({
-                    class: 'iv-select-search',
+                    class: 'iv-select-search w3-col w3-mobile',
                     autocomplete: 'off',
                     style: "border:none;" + args.search_style,
                     placeholder: args.placeholder
@@ -510,10 +509,7 @@ $.fn.extend({
                 if ( class_for_search != '' ) {
                     search_element.addClass( args.class_for_search );
                 }
-                // var search_el_container = $('<div/>');
-                // search_el_container.addClass('iv-select-search-container w3-col');
-                // search_el_container.css('width', 'auto');
-                // search_el_container.append( search_element );
+                search_element.css('width', 'auto');
                 text_element.append( search_element );
             } else {
                 text_element.css({width: '100%'});
