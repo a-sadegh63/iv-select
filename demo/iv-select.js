@@ -5,9 +5,30 @@ const iv_elements = {
     search_el: 3, //search element iv-select-search class
     value_el: 4, //value element iv-select-value class
     options_el: 5, //options container element iv-select-options class
-    search_container_el: 6, //search container element iv-select-search-container class
+    item_el: 6, //selected item element iv-selected-item class
     delete_button: 7, //delete button element iv-del-button class
 };
+
+const iv_settings = {
+    main_el: {
+        styles: {
+            position: 'relative',
+        },
+        classes: 'iv-select w3-round'
+    },
+    view_el: {
+        styles: {
+            
+        },
+        classes: 'iv-select-view w3-row w3-padding-small'
+    },
+    text_el: {
+        styles: {
+            width: 'auto',
+        },
+        classes: 'iv-select-text w3-col'
+    },
+}
 
 $(document).on('click', '.iv-select-view', function(e) {
     var target_el = $(e.target);
@@ -336,8 +357,8 @@ $.fn.extend({
             search_el: 3, //search element iv-select-search class
             value_el: 4, //value element iv-select-value class
             options_el: 5, //options container element iv-select-options class
-            search_container_el: 6, //search container element iv-select-search-container class
-            delete_button: 7,
+            item_el: 6, //selected item element iv-selected-item class
+            delete_button: 7, //delete button element iv-del-button class
         };
      * @returns {array|false} A jQuery array of all/specific **iv_select** elements associated with the
      * current element or false when the present part is not an **iv_select** element
@@ -363,8 +384,8 @@ $.fn.extend({
             case this.hasClass('iv-select-options') :
                 iv_element = this.parent();
                 break;
-            case this.hasClass('iv-select-search-container') :
-                iv_element = this.parent().parent();
+            case this.hasClass('iv-selected-item') :
+                iv_element = this.parent().parent().parent();
                 break;
             case this.hasClass('iv-del-button') :
                 iv_element = this.parent().parent().parent().parent();
@@ -385,8 +406,10 @@ $.fn.extend({
                 return iv_element.children('.iv-select-value');
             case iv_elements.options_el :
                 return iv_element.children('.iv-select-options');
-            case iv_elements.search_container_el :
-                return iv_element.children('.iv-select-view').children('.iv-select-search-container');
+            case iv_elements.item_el :
+                return iv_element.children('.iv-select-view').children('.iv-select-text').children('.iv-selected-item');
+            case iv_elements.delete_button :
+                return iv_element.children('.iv-select-view').find('.iv-del-button');
             case 'all' :
                 return {
                     main_el: iv_element,
@@ -395,7 +418,8 @@ $.fn.extend({
                     search_el: iv_element.children('.iv-select-view').children('.iv-select-search'),
                     value_el: iv_element.children('.iv-select-value'),
                     options_el: iv_element.children('.iv-select-options'),
-                    search_container_el: iv_element.children('.iv-select-view').children('.iv-select-search-container'),
+                    item_el: iv_element.children('.iv-select-view').children('.iv-select-text').children('.iv-selected-item'),
+                    delete_button: iv_element.children('.iv-select-view').find('.iv-del-button')
                 };
         }
     },
@@ -433,12 +457,11 @@ $.fn.extend({
                 close_after_click,
                 no_search_element
             }
-            var existing_class = '';
             var select_el = $(this);
             if (select_el[0].tagName != 'SELECT') return;
             if (select_el.hasClass('iv-select-value')) return;
-            existing_class = select_el.attr('class');
-            if (existing_class !== undefined && existing_class != '') {
+            var existing_class = select_el.attr('class');
+            if ( existing_class !== undefined && existing_class != '' ) {
                 switch (args.keep_existing_class) {
                     case 'toValue':
                         args.class_for_value += ' ' + existing_class;
@@ -460,10 +483,30 @@ $.fn.extend({
                 $(this).attr('style', args.option_style);
             });
             if (select_el.prop('multiple') === true) multiple = 'multiple';
-            var iv_select = $('<div/>').attr({
-                class: 'iv-select w3-round ' + args.container_class,
-            });
-            iv_select.css('position', 'relative');
+
+            //add main element
+            var iv_select = $('<div/>');
+            iv_select.addClass( iv_settings.main_el.classes );
+            iv_select.css( iv_settings.main_el.styles );
+            if ( args.container_class != '' ) {
+                iv_select.addClass( args.container_class );
+            }
+
+            //add view element
+            var view_element = $('<div/>');
+            view_element.addClass( iv_settings.view_el.classes );
+            
+            //add text element
+            var text_element = $('<div/>');
+            text_element.addClass( iv_settings.text_el.classes );
+            text_element.css( iv_settings.text_el.styles );
+            if ( args.text_el_style != '' ) {
+                text_element.attr( 'style', args.text_el_style );
+            }
+            if ( args.text_el_class != '' ) {
+                text_element.addClass( args.text_el_class );
+            }
+
             var tabindex = select_el.attr('tabindex');
             if ( tabindex !== 'undefined' && tabindex !== false ) {
                 iv_select.attr('tabindex', tabindex);
@@ -485,20 +528,8 @@ $.fn.extend({
                 class: 'iv-select-options ' + args.options_container_class,
                 style: 'display:none;position:absolute;width:100%;' + args.options_container_style,
             });
-            var text_element_container = $('<div/>');
-            iv_select.css( {cursor:'pointer!important'} );
-            text_element_container.addClass( 'iv-select-view w3-row w3-padding-small' );
-            var text_element = $('<div/>').attr({
-                class: 'iv-select-text w3-col'
-            });
-            if ( args.text_el_style != '' ) {
-                text_element.attr( 'style', args.text_el_style );
-            }
-            if ( args.text_el_class != '' ) {
-                text_element.addClass( args.text_el_class );
-            }
-            text_element.css('width', 'auto');
-            text_element_container.append( text_element );
+
+            view_element.append( text_element );
             if ( ! args.no_search_element ) {
                 var search_element = $('<input>').attr({
                     class: 'iv-select-search w3-col w3-mobile',
@@ -523,7 +554,7 @@ $.fn.extend({
                 })
             );
             options_container.append(options);
-            iv_select.append(text_element_container, value_element, options_container);
+            iv_select.append(view_element, value_element, options_container);
             if ( select_el.data('iv-init-value') !== undefined ) {
                 if (select_el.prop('multiple') === false) {
                     first_value = select_el.data('iv-init-value');
