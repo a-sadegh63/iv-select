@@ -28,6 +28,27 @@ const iv_settings = {
         },
         classes: 'iv-select-text w3-col'
     },
+    search_el: {
+        styles: {
+            border: 'none',
+            width: 'auto',
+        },
+        classes: 'iv-select-search w3-col w3-mobile'
+    },
+    value_el: {
+        styles: {
+            display: 'none',
+        },
+        classes: 'iv-select-value'
+    },
+    options_el: {
+        styles: {
+            display: 'none',
+            position: 'absolute',
+            width: '100%'
+        },
+        classes: 'iv-select-options'
+    },
 }
 
 $(document).on('click', '.iv-select-view', function(e) {
@@ -237,34 +258,33 @@ function addIvItem(item_text, item_val) {
                     $(this).insertBefore( iv_text_el.children('.iv-select-search') );
                 }
             });
-        } 
-        
-        // iv_text_el.empty().append(value_text);
+        }         
         originalFn.apply(this, arguments);
     };
 })(jQuery);
 
 $.fn.extend({
-    iv_updateOptions: function(new_options) {
-        if (!this.hasClass('iv-select-value')) return;
-        var options_container = this.nextAll('div.iv-select-options');
-        options_container.empty().append(new_options);
+    iv_updateOptions: 
+    /**
+     * With this function you able to replace iv-select options with new options
+     * @param {object} new_options jQuery object from new option elements
+     */
+    function( new_options ) {
+        var options_container = this.iv_findElement( iv_elements.options_el );
+        if ( options_container !== false ) {
+            options_container.empty().append(new_options);
+        }
     },
-    iv_getOptions: function() {
-        if (!this.hasClass('iv-select-value')) return;
-        var options_container = this.nextAll('div.iv-select-options');
-        var option_nodes = options_container.children('option');
-        var option_html = '';
-        option_nodes.each( function() {
-            $(this).removeAttr('style');
-            $(this).removeAttr('class');
-            option_html = option_html + this.outerHTML;
-        });
-        return option_html;
-    },
-    iv_getValuesArray: function() {
-        if (!this.hasClass('iv-select-value')) return;
-        var options_container = this.nextAll('div.iv-select-options');
+    iv_getPossibleValues: 
+    /**
+     * With this function you able to get iv-select possible values array
+     * @returns {false|array}
+     */
+    function() {
+        var options_container = this.iv_findElement( iv_elements.options_el );
+        if ( options_container === false ) {
+            return false;
+        }
         var option_nodes = options_container.children('option');
         const opt_values = [];
         option_nodes.each( function() {
@@ -272,64 +292,65 @@ $.fn.extend({
         });
         return opt_values;
     },
-    iv_cloneSelect: function({
+    iv_cloneSelect: 
+    function({
         name = "",
         id = "",
-        placeholder = "Type to search",
-        text_el_class = "w3-block w3-border",
-        text_el_style = "background-color:white;cursor:pointer!important;padding:7px 8px;",
+        placeholder = "Select an option",
+        text_el_class = "",
+        text_el_style = "",
         container_class = "",
         container_style = "",
         options_container_class = "",
         options_container_style = "",
-        option_class = "w3-block w3-button w3-hover-blue w3-border-left w3-border-right",
+        option_class = "",
         option_style = "",
         remove_unselected = true,
         close_after_click = true
     } = {}) {
-        if (!this.hasClass('iv-select-value')) return;        
-        var value = this.val();
-        var iv_select_container = this.parent('div.iv-select');
-        var cloned_iv = iv_select_container.clone();
-        cloned_iv.attr({
-            class: 'iv-select ' + container_class,
-            style: container_style
-        });
+        var iv_elements = this.iv_findElement( 'all' );
+        if ( iv_elements === false ) return false;
+        var value = iv_elements.value_el.val();
+        iv_elements.main_el.addClass( container_class );
+        iv_elements.main_el.css( iv_elements.main_el.attr('style') + container_style );
         if ( name != '' ) {
-            cloned_iv.children('select.iv-select-value').attr('name', name);
+            iv_elements.value_el.attr( 'name', name) ;
+        } else {
+            iv_elements.value_el.removeAttr('name');
         }
         if ( id != '' ) {
-            cloned_iv.children('select.iv-select-value').attr('id', id);
+            iv_elements.value_el.attr('id', id);
         } else {
-            cloned_iv.children('select.iv-select-value').removeAttr('id');
+            iv_elements.value_el.removeAttr('id');
         }
-        if ( cloned_iv.children('select.iv-select-value').prop('multiple') === true ) {
-            cloned_iv.children('select.iv-select-value').children('option').each(function() {
+        if ( iv_elements.value_el.prop('multiple') === true ) {
+            iv_elements.options_el.children('option').each(function() {
                 $(this).attr('selected', true);
             });
         }
-        cloned_iv.children('input.iv-select-search').attr('placeholder', placeholder);
-        cloned_iv.children('div.iv-select-text').attr({
-            class: 'iv-select-text ' + text_el_class,
-            style: text_el_style
-        });
-        cloned_iv.children('div.iv-select-options').attr({
-            class: 'iv-select-options ' + options_container_class,
-            style: options_container_style
-        });
-        if (remove_unselected) {
-            cloned_iv.children('div.iv-select-options').children('option').filter(function() {
+        iv_elements.search_el.attr('placeholder', placeholder);
+        iv_elements.search_el.data('iv_placeholder', placeholder);
+
+        iv_elements.text_el.addClass( text_el_class );
+        iv_elements.text_el.css( iv_elements.text_el.attr('style') + text_el_style );
+
+        iv_elements.options_el.addClass( options_container_class );
+        iv_elements.options_el.css( iv_elements.options_el.attr('style') + options_container_style );
+
+        if ( remove_unselected ) {
+            iv_elements.options_el.children('option').filter(function() {
                 if ($(this).val() != value) {
                     $(this).remove();
                 }
             });
         }
-        cloned_iv.children('div.iv-select-options').children('option').each(function() {
-            $(this).attr('style', option_style);
-            $(this).addClass(option_class);
-            $(this).data('iv_closeAfterClick', close_after_click);
+        iv_elements.options_el.children('option').each(function() {
+            $(this).attr( 'style', $(this).attr('style') + option_style );
+            $(this).addClass( option_class );
+            $(this).data( 'iv_closeAfterClick', close_after_click );
         });
-        return cloned_iv;
+        var cloned_id = iv_elements.main_el.append( iv_elements.view_el, iv_elements.value_el, iv_elements.options_el );
+        return cloned_id;
     },
     is_ivSelect: function() {
         if (!this.hasClass('iv-select-value')) return false;
@@ -424,7 +445,7 @@ $.fn.extend({
         }
     },
     iv_selectConvert: function({
-        placeholder = "Type to search",
+        placeholder = "Select an option",
         text_el_class = "",
         text_el_style = "",
         class_for_search = "",
@@ -460,6 +481,8 @@ $.fn.extend({
             var select_el = $(this);
             if (select_el[0].tagName != 'SELECT') return;
             if (select_el.hasClass('iv-select-value')) return;
+
+            //Determining the new iv-select element for existing class in the select element
             var existing_class = select_el.attr('class');
             if ( existing_class !== undefined && existing_class != '' ) {
                 switch (args.keep_existing_class) {
@@ -474,15 +497,6 @@ $.fn.extend({
                         break;
                 }
             }
-            var first_value = select_el.val();
-            var options = select_el.children('option');
-            var multiple;
-            options.last().addClass('w3-border-bottom');
-            options.each(function() {
-                $(this).addClass(args.option_class);
-                $(this).attr('style', args.option_style);
-            });
-            if (select_el.prop('multiple') === true) multiple = 'multiple';
 
             //add main element
             var iv_select = $('<div/>');
@@ -507,11 +521,36 @@ $.fn.extend({
                 text_element.addClass( args.text_el_class );
             }
 
+            view_element.append( text_element );
+            //add search element
+            if ( ! args.no_search_element ) {
+                var search_element = $('<input>').attr({
+                    autocomplete: 'off',
+                    placeholder: args.placeholder
+                });
+                search_element.data( 'iv_placeholder', placeholder );
+                search_element.addClass( iv_settings.search_el.classes );
+                search_element.css( iv_settings.search_el.styles );
+                if ( args.search_style != '' ) {
+                    search_element.attr( 'style', search_element.attr('style') + args.search_style );
+                }
+                if ( class_for_search != '' ) {
+                    search_element.addClass( args.class_for_search );
+                }
+                text_element.append( search_element );
+            } else {
+                text_element.css({width: '100%'});
+                iv_select.css({'min-width': '100px', padding:'7px 8px'});
+            }
+
+            //start convert to iv-select
+            //add tabindex to main el
             var tabindex = select_el.attr('tabindex');
             if ( tabindex !== 'undefined' && tabindex !== false ) {
                 iv_select.attr('tabindex', tabindex);
                 select_el.removeAttr('tabindex');
             }
+            //add value element
             var attributes = select_el[0].attributes;
             var value_element = $('<select>');
             $.each( attributes, function( index, attribute ) {
@@ -519,42 +558,49 @@ $.fn.extend({
                 var attr_value = attribute.nodeValue;
                 value_element.attr({ [attr_name]: attr_value });
             });
+            value_element.css( iv_settings.value_el.styles );
+            value_element.addClass( iv_settings.value_el.classes );
+            if ( args.class_for_value != '' ) {
+                value_element.addClass( args.class_for_value );
+            }
+            var multiple;
+            if (select_el.prop('multiple') === true) multiple = 'multiple';
             value_element.attr({
-                style: 'display:none;',
-                class: 'iv-select-value ' + args.class_for_value,
                 multiple: multiple
             });
+
+            //add option container element
             var options_container = $('<div/>').attr({
                 class: 'iv-select-options ' + args.options_container_class,
                 style: 'display:none;position:absolute;width:100%;' + args.options_container_style,
             });
-
-            view_element.append( text_element );
-            if ( ! args.no_search_element ) {
-                var search_element = $('<input>').attr({
-                    class: 'iv-select-search w3-col w3-mobile',
-                    autocomplete: 'off',
-                    style: "border:none;" + args.search_style,
-                    placeholder: args.placeholder
-                });
-                if ( class_for_search != '' ) {
-                    search_element.addClass( args.class_for_search );
-                }
-                search_element.css('width', 'auto');
-                text_element.append( search_element );
-            } else {
-                text_element.css({width: '100%'});
-                iv_select.css({'min-width': '100px', padding:'7px 8px'});
+            options_container.addClass( iv_settings.options_el.classes );
+            options_container.css( iv_settings.options_el.styles );
+            if ( args.search_style != '' ) {
+                options_container.attr( 'style', options_container.attr('style') + args.options_container );
             }
-            options.data('iv_closeAfterClick', args.close_after_click);
+            //add value null option
             options_container.append(
                 $('<option/>').attr({
                     class: 'w3-hide',
                     value: ''
                 })
             );
+            //add options to container
+            var options = select_el.children('option');
+            options.data('iv_closeAfterClick', args.close_after_click);
+            options.last().addClass('w3-border-bottom');
+            options.each(function() {
+                $(this).addClass(args.option_class);
+                $(this).attr('style', args.option_style);
+            });
             options_container.append(options);
-            iv_select.append(view_element, value_element, options_container);
+
+            //add elements to the main container
+            iv_select.append( view_element, value_element, options_container );
+
+            //set value of the iv-select
+            var first_value = select_el.val();
             if ( select_el.data('iv-init-value') !== undefined ) {
                 if (select_el.prop('multiple') === false) {
                     first_value = select_el.data('iv-init-value');
@@ -567,6 +613,8 @@ $.fn.extend({
             } else {
                 iv_select.find('select.iv-select-value').val('');
             }
+
+            //replace element with iv-select
             select_el.replaceWith(iv_select);
         });
     }
