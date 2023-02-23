@@ -43,15 +43,94 @@ const iv_settings = {
         },
         classes: 'iv-select-value'
     },
+    item_el: {
+        styles: {
+            'width': 'fit-content',
+            'margin-left': '1px',
+            'margin-right': '1px',
+            'white-space': 'nowrap'
+        },
+        classes: 'iv-selected-item w3-cell-row w3-col w3-card w3-blue-gray w3-round w3-small'
+    },
+    selected_item_text: {
+        styles: {
+            padding:'2px 8px'
+        },
+        classes: 'iv-selected-item-text w3-cell'
+    },
+    delete_button: {
+        styles: {
+            padding:'2px 8px',
+            'font-weight': 900
+        },
+        classes: 'iv-del-button w3-hover-black w3-round w3-red w3-button w3-cell'
+    },
     options_container_el: {
         styles: {
             display: 'none',
             position: 'absolute',
-            width: '100%'
+            width: '100%',
+            'max-height': '200px',
+            'z-index': '10',
+            'overflow-y': 'auto',
+            'overflow-x': 'hidden',
+            'word-break': 'break-all',
+            'border-top': 'hidden',
+            'border-right': '1px solid #ccc !important',
+            'border-left': '1px solid #ccc !important',
+            'border-bottom': '1px solid #ccc !important',
+            'border-radius': '0 0 4px 4px',
+            'outline': 'none !important',
+            'box-shadow': '0 0 10px #719ECE',
+            'font-size': '13px',
+            'background-color': 'white!important'
         },
         classes: 'iv-select-options'
     },
+    inline_styles: {
+        ".iv-select-text:focus": {
+            "border-top": "1px solid #ccc !important",
+            "border-right": "1px solid #ccc !important",
+            "border-left": "1px solid #ccc !important",
+            "border-bottom": "hidden",
+        },
+        ".iv-select-search:focus": {
+            "outline": "none",
+        },
+        ".iv-select-options option": {
+            "padding": "2px 0px!important",
+            "text-align": "inherit",
+        }
+    }
 }
+
+$(document).ready(function() {
+    var elem = $('.iv-select-search')[0];
+    var page_dir;
+    if ( window.getComputedStyle ) { // all browsers
+        page_dir = window.getComputedStyle( elem, null ).getPropertyValue( 'direction' );
+    } else {
+        page_dir = elem.currentStyle.direction; // IE5-8
+    }
+    if ( page_dir == 'rtl' ) {
+        iv_settings.inline_styles['.w3-col'] = {
+            'float': 'right'
+        }
+    }
+
+    //add inline styles
+    var inline_css = '';
+    for ( var css_selector in iv_settings.inline_styles ) {
+        inline_css += `${css_selector}{\n`;
+        for ( var prop in iv_settings.inline_styles[css_selector] ) {
+            inline_css += `\t${prop}:${iv_settings.inline_styles[css_selector][prop]};\n`;
+        }
+        inline_css += `}\n`;
+    }
+    var inline_css_obj = $('<style/>').attr( 'id', 'iv-select-styles' );
+    inline_css_obj.html( inline_css );
+    $('head').append( inline_css_obj );
+});
 
 $(document).on('click', '.iv-select-view', function(e) {
     var target_el = $(e.target);
@@ -62,10 +141,25 @@ $(document).on('click', '.iv-select-view', function(e) {
     ) {
         return;
     }
+    var main_el = target_el.iv_findElement( iv_elements.main_el );
     var options_container = target_el.iv_findElement( iv_elements.options_container_el );
     var value_el = target_el.iv_findElement( iv_elements.value_el );
     if ( value_el.prop('disabled') ) return;
-    options_container.toggle(200);
+    if ( options_container.is(":visible") ) {
+        options_container.hide(200, function() {
+            main_el.css({
+                'border-bottom-right-radius': '4px',
+                'border-bottom-left-radius': '4px',
+            });
+        });
+    } else {
+        options_container.show(200, function() {
+            main_el.css({
+                'border-bottom-right-radius': '0px',
+                'border-bottom-left-radius': '0px',
+            });
+        });
+    }
 });
 
 const ivSelectOninvalid = (iv_value_dom, err_message) => {
@@ -187,22 +281,29 @@ $(document).on('click', function(e) {
 
 function addIvItem(item_text, item_val) {
     if ( item_text == '' ) return '&nbsp;';
+    //add container node
     var container_node = $('<div/>').attr({
-        class: 'iv-selected-item w3-cell-row w3-col w3-card w3-blue-gray w3-round w3-small'
+        class: iv_settings.item_el.classes
     });
-    container_node.data('iv_itemValue', item_val);
-    container_node.attr('style', 'width:fit-content;margin-left:1px;margin-right:1px;white-space:nowrap;');
+    container_node[0].dataset.iv_itemValue = item_val;
+    container_node.css( iv_settings.item_el.styles );
+
+    //add selected item text
     var text_node = $('<span/>').attr({
-        class: 'iv-selected-item-text w3-cell',
-        style: 'padding:2px 8px;'
+        class: iv_settings.selected_item_text.classes,
     });
+    text_node.css( iv_settings.selected_item_text.styles );
     text_node.html(item_text + '&nbsp;');
+
+    //add delete button
     var btn_node = $('<button/>').attr({
-        class: 'iv-del-button w3-hover-black w3-round w3-red w3-button w3-cell',
+        class: iv_settings.delete_button.classes,
         style: 'padding:2px 8px;font-weight:900',
         type: 'button'
     });
+    btn_node.css( iv_settings.delete_button.styles );
     btn_node.html('&times;');
+    
     return (container_node.append(text_node, btn_node));
 }
 
