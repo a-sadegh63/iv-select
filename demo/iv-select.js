@@ -35,7 +35,7 @@ const iv_settings = {
             border: 'none',
             width: 'auto',
         },
-        classes: 'iv-select-search w3-col w3-mobile'
+        classes: 'iv-select-search w3-col'
     },
     value_el: {
         styles: {
