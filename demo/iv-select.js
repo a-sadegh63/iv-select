@@ -4,9 +4,11 @@ const iv_elements = {
     text_el: 2, //text element iv-select-text class
     search_el: 3, //search element iv-select-search class
     value_el: 4, //value element iv-select-value class
-    options_el: 5, //options container element iv-select-options class
+    options_container_el: 5, //options container element iv-select-options class
     item_el: 6, //selected item element iv-selected-item class
     delete_button: 7, //delete button element iv-del-button class
+    options_el: 8, //option elements
+    selected_item_text: 9 //selected item text span iv-selected-item-text class
 };
 
 const iv_settings = {
@@ -41,7 +43,7 @@ const iv_settings = {
         },
         classes: 'iv-select-value'
     },
-    options_el: {
+    options_container_el: {
         styles: {
             display: 'none',
             position: 'absolute',
@@ -53,23 +55,18 @@ const iv_settings = {
 
 $(document).on('click', '.iv-select-view', function(e) {
     var target_el = $(e.target);
-    var options_container = target_el.iv_findElement( iv_elements.options_el );
+    if ( 
+        target_el.hasClass('iv-selected-item-text') || 
+        target_el.hasClass('iv-del-button') ||
+        target_el.hasClass('iv-selected-item')
+    ) {
+        return;
+    }
+    var options_container = target_el.iv_findElement( iv_elements.options_container_el );
     var value_el = target_el.iv_findElement( iv_elements.value_el );
-    var search_el = target_el.iv_findElement( iv_elements.search_el );
     if ( value_el.prop('disabled') ) return;
-    ivSelectDropDown( options_container, search_el, true );
-});
-
-function ivSelectDropDown( options_container, search_el, clear_filter = true ) {
-    search_el.val('');
-    var options = options_container.children('option');
-    setTimeout(function() { search_el.focus() }, 100);
-    $('div.iv-select-options').not(options_container).hide();
-    // $('input.iv-select-search').not(search_el).hide();
-    if (clear_filter) options.show();
     options_container.toggle(200);
-    $('div.iv-select-options').not(options_container).hide(200);
-}
+});
 
 const ivSelectOninvalid = (iv_value_dom, err_message) => {
     var text_el = $(iv_value_dom).iv_textEl();
@@ -114,8 +111,8 @@ jQuery.propHooks.disabled = {
 
 $(document).on('click', '.iv-select-options option', function(e) {
     var target_el = $(e.target);
-    var value_el = target_el.parent().parent().find('.iv-select-value');
-    var search_el = target_el.prevAll('.iv-select-search');
+    var value_el = target_el.iv_findElement( iv_elements.value_el );
+    var search_el = target_el.iv_findElement( iv_elements.search_el );
     if (value_el.prop('multiple') === true) {
         var current_value = value_el.val();
         if (!Array.isArray(current_value)) {
@@ -142,13 +139,13 @@ $(document).on('click', '.iv-del-button', function(e) {
     if ( iv_value_el.prop('disabled') ) return;
     var item_container = target_el.parent();
     var del_item = item_container.data('iv_itemValue');
-    if (iv_value_el.prop('multiple') === true) {
+    if ( iv_value_el.prop('multiple') === true ) {
         var current_value = iv_value_el.val();
         if (Array.isArray(current_value)) {
             const index = current_value.indexOf(del_item);
             if (index != -1) {
                 current_value.splice(index, 1);
-                iv_value_el.val(current_value)
+                iv_value_el.val( current_value )
             }
         } else {
             iv_value_el.val([]);
@@ -164,7 +161,7 @@ $(document).on('click', '.iv-del-button', function(e) {
 $(document).on('keyup', 'input.iv-select-search', function(e) {
     var target = $(e.target);
     var search = target.val();
-    var options = target.iv_findElement( iv_elements.options_el ).children('option');
+    var options = target.iv_findElement( iv_elements.options_container_el ).children('option');
     options.removeClass('w3-border-bottom');
     options.hide();
     const result = options.filter(index => $(options[index]).text().toLowerCase().indexOf(search.toLowerCase()) > -1);
@@ -175,8 +172,10 @@ $(document).on('keyup', 'input.iv-select-search', function(e) {
 $(document).on('click', function(e) {
     if (
         $('.iv-select-options:hover').length == 0 &&
-        $('.iv-select-text:hover').length == 0 &&
-        $('.iv-select-icon:hover').length == 0 &&
+        $('.iv-select-view:hover').length == 0 &&
+        $('.iv-selected-item:hover').length == 0 &&
+        $('.iv-selected-item:hover').length == 0 &&
+        $('.iv-del-button:hover').length == 0 &&
         $('.iv-select-search:hover').length == 0
     ) {
         $('.iv-select-options').hide(200);
@@ -187,14 +186,14 @@ $(document).on('click', function(e) {
 });
 
 function addIvItem(item_text, item_val) {
-    if ( item_text == '' ) return '';
+    if ( item_text == '' ) return '&nbsp;';
     var container_node = $('<div/>').attr({
         class: 'iv-selected-item w3-cell-row w3-col w3-card w3-blue-gray w3-round w3-small'
     });
     container_node.data('iv_itemValue', item_val);
     container_node.attr('style', 'width:fit-content;margin-left:1px;margin-right:1px;white-space:nowrap;');
     var text_node = $('<span/>').attr({
-        class: 'w3-cell',
+        class: 'iv-selected-item-text w3-cell',
         style: 'padding:2px 8px;'
     });
     text_node.html(item_text + '&nbsp;');
@@ -211,54 +210,56 @@ function addIvItem(item_text, item_val) {
     var originalFn = $.fn.val;
     $.fn.val = function(value) {
         if (!this.hasClass('iv-select-value') || value === undefined) return originalFn.apply(this, arguments);
-        var options = this.iv_findElement( iv_elements.options_el ).children('option'); 
+        var options = this.iv_findElement( iv_elements.options_container_el ).children('option'); 
         var iv_text_el = this.iv_findElement( iv_elements.text_el ); 
+        var iv_search_el = this.iv_findElement( iv_elements.search_el );
         var value_text = [];
         var value_option = '';
-        if (this.prop('multiple') !== true) {
+        if ( this.prop('multiple') !== true ) {
             if (Array.isArray(value)) value = value[0];
         }
         options.each(function() {
             if (Array.isArray(value)) {
                 if (value.indexOf($(this).val()) != -1) {
                     $(this).removeClass('w3-white');
-                    $(this).addClass('w3-light-gray');
+                    $(this).addClass('w3-dark-gray');
                     value_text.push(addIvItem($(this).text(), $(this).val()));
                     $(this).prop("selected", true);
                     value_option += $(this)[0].outerHTML;
                 } else {
                     $(this).prop("selected", false);
                     $(this).addClass('w3-white');
-                    $(this).removeClass('w3-light-gray');
+                    $(this).removeClass('w3-dark-gray');
                 }
             } else {
                 if ($(this).val() == value) {
                     $(this).removeClass('w3-white');
-                    $(this).addClass('w3-light-gray');
+                    $(this).addClass('w3-dark-gray');
                     value_text.push(addIvItem($(this).text(), $(this).val()));
                     $(this).prop("selected", true);
                     value_option += $(this)[0].outerHTML;
                 } else {
                     $(this).prop("selected", false);
                     $(this).addClass('w3-white');
-                    $(this).removeClass('w3-light-gray');
+                    $(this).removeClass('w3-dark-gray');
                 }
             }
         });
-        // if ( value_text.length === 0 ) value_text = '&nbsp;';
+        if ( value_text.length === 0 ) value_text = '&nbsp;';
         if ( this.attr('required') ) {
             if ( value == '' ) {
                 this[0].setCustomValidity('Please fill out this field');
             }
         }
         this.empty().append(value_option);
-        if ( Array.isArray(value_text) ) {
-            jQuery.each( value_text, function () {
-                if ( this instanceof Object && this !== null ) {
-                    $(this).insertBefore( iv_text_el.children('.iv-select-search') );
-                }
-            });
-        }         
+        iv_text_el.empty().append( value_text );
+        iv_text_el.append( iv_search_el );
+        if ( ! value || value.length === 0 ) {
+            iv_search_el.attr( 'placeholder', iv_search_el[0].dataset.iv_placeholder );
+        } else {
+            iv_search_el.removeAttr('placeholder');
+        }
+        iv_search_el.val('');
         originalFn.apply(this, arguments);
     };
 })(jQuery);
@@ -270,9 +271,19 @@ $.fn.extend({
      * @param {object} new_options jQuery object from new option elements
      */
     function( new_options ) {
-        var options_container = this.iv_findElement( iv_elements.options_el );
+        var options_container = this.iv_findElement( iv_elements.options_container_el );
         if ( options_container !== false ) {
-            options_container.empty().append(new_options);
+            options_container.empty();
+            //add value null option
+            if ( new_options.first().val() != '' ) {
+                options_container.append(
+                    $('<option/>').attr({
+                        class: 'w3-hide',
+                        value: ''
+                    })
+                );
+            }
+            options_container.append( new_options );
         }
     },
     iv_getPossibleValues: 
@@ -281,7 +292,7 @@ $.fn.extend({
      * @returns {false|array}
      */
     function() {
-        var options_container = this.iv_findElement( iv_elements.options_el );
+        var options_container = this.iv_findElement( iv_elements.options_container_el );
         if ( options_container === false ) {
             return false;
         }
@@ -324,7 +335,7 @@ $.fn.extend({
             iv_elements.value_el.removeAttr('id');
         }
         if ( iv_elements.value_el.prop('multiple') === true ) {
-            iv_elements.options_el.children('option').each(function() {
+            iv_elements.options_container_el.children('option').each(function() {
                 $(this).attr('selected', true);
             });
         }
@@ -334,22 +345,22 @@ $.fn.extend({
         iv_elements.text_el.addClass( text_el_class );
         iv_elements.text_el.css( iv_elements.text_el.attr('style') + text_el_style );
 
-        iv_elements.options_el.addClass( options_container_class );
-        iv_elements.options_el.css( iv_elements.options_el.attr('style') + options_container_style );
+        iv_elements.options_container_el.addClass( options_container_class );
+        iv_elements.options_container_el.css( iv_elements.options_container_el.attr('style') + options_container_style );
 
         if ( remove_unselected ) {
-            iv_elements.options_el.children('option').filter(function() {
+            iv_elements.options_container_el.children('option').filter(function() {
                 if ($(this).val() != value) {
                     $(this).remove();
                 }
             });
         }
-        iv_elements.options_el.children('option').each(function() {
+        iv_elements.options_container_el.children('option').each(function() {
             $(this).attr( 'style', $(this).attr('style') + option_style );
             $(this).addClass( option_class );
             $(this).data( 'iv_closeAfterClick', close_after_click );
         });
-        var cloned_id = iv_elements.main_el.append( iv_elements.view_el, iv_elements.value_el, iv_elements.options_el );
+        var cloned_id = iv_elements.main_el.append( iv_elements.view_el, iv_elements.value_el, iv_elements.options_container_el );
         return cloned_id;
     },
     is_ivSelect: function() {
@@ -377,9 +388,11 @@ $.fn.extend({
             text_el: 2, //text element iv-select-text class
             search_el: 3, //search element iv-select-search class
             value_el: 4, //value element iv-select-value class
-            options_el: 5, //options container element iv-select-options class
+            options_container_el: 5, //options container element iv-select-options class
             item_el: 6, //selected item element iv-selected-item class
             delete_button: 7, //delete button element iv-del-button class
+            options_el: 8, //option elements
+            selected_item_text: 9 //selected item text span iv-selected-item-text class
         };
      * @returns {array|false} A jQuery array of all/specific **iv_select** elements associated with the
      * current element or false when the present part is not an **iv_select** element
@@ -409,7 +422,11 @@ $.fn.extend({
                 iv_element = this.parent().parent().parent();
                 break;
             case this.hasClass('iv-del-button') :
+            case this.hasClass('iv-selected-item-text') :
                 iv_element = this.parent().parent().parent().parent();
+                break;
+            case this.parent().hasClass('iv-select-options') :
+                iv_element = this.parent().parent();
                 break;
             default :
                 return false;
@@ -422,15 +439,19 @@ $.fn.extend({
             case iv_elements.text_el :
                 return iv_element.children('.iv-select-view').children('.iv-select-text');
             case iv_elements.search_el :
-                return iv_element.children('.iv-select-view').children('.iv-select-search');
+                return iv_element.children('.iv-select-view').children('.iv-select-text').children('.iv-select-search');
             case iv_elements.value_el :
                 return iv_element.children('.iv-select-value');
-            case iv_elements.options_el :
+            case iv_elements.options_container_el :
                 return iv_element.children('.iv-select-options');
             case iv_elements.item_el :
                 return iv_element.children('.iv-select-view').children('.iv-select-text').children('.iv-selected-item');
             case iv_elements.delete_button :
                 return iv_element.children('.iv-select-view').find('.iv-del-button');
+            case iv_elements.options_el :
+                return iv_element.children('.iv-select-options').children('option');
+            case iv_elements.selected_item_text :
+                return iv_element.children('.iv-select-view').find('.iv-selected-item-text');    
             case 'all' :
                 return {
                     main_el: iv_element,
@@ -438,9 +459,11 @@ $.fn.extend({
                     text_el: iv_element.children('.iv-select-view').children('.iv-select-text'),
                     search_el: iv_element.children('.iv-select-view').children('.iv-select-search'),
                     value_el: iv_element.children('.iv-select-value'),
-                    options_el: iv_element.children('.iv-select-options'),
+                    options_container_el: iv_element.children('.iv-select-options'),
                     item_el: iv_element.children('.iv-select-view').children('.iv-select-text').children('.iv-selected-item'),
-                    delete_button: iv_element.children('.iv-select-view').find('.iv-del-button')
+                    delete_button: iv_element.children('.iv-select-view').find('.iv-del-button'),
+                    options_el: iv_element.children('.iv-select-options').children('option'),
+                    selected_item_text: iv_element.children('.iv-select-view').find('.iv-selected-item-text'),
                 };
         }
     },
@@ -528,7 +551,7 @@ $.fn.extend({
                     autocomplete: 'off',
                     placeholder: args.placeholder
                 });
-                search_element.data( 'iv_placeholder', placeholder );
+                search_element[0].dataset.iv_placeholder = placeholder;
                 search_element.addClass( iv_settings.search_el.classes );
                 search_element.css( iv_settings.search_el.styles );
                 if ( args.search_style != '' ) {
@@ -574,8 +597,8 @@ $.fn.extend({
                 class: 'iv-select-options ' + args.options_container_class,
                 style: 'display:none;position:absolute;width:100%;' + args.options_container_style,
             });
-            options_container.addClass( iv_settings.options_el.classes );
-            options_container.css( iv_settings.options_el.styles );
+            options_container.addClass( iv_settings.options_container_el.classes );
+            options_container.css( iv_settings.options_container_el.styles );
             if ( args.search_style != '' ) {
                 options_container.attr( 'style', options_container.attr('style') + args.options_container );
             }
