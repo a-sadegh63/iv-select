@@ -87,6 +87,12 @@ const iv_settings = {
         },
         classes: 'iv-select-options'
     },
+    options_el: {
+        styles: {
+
+        },
+        classes: 'w3-block w3-button w3-hover-blue w3-border-left w3-border-right'
+    },
     inline_styles: {
         ".iv-select-text:focus": {
             "border-top": "1px solid #ccc !important",
@@ -331,26 +337,22 @@ function addIvItem(item_text, item_val) {
         options.each(function() {
             if (Array.isArray(value)) {
                 if (value.indexOf($(this).val()) != -1) {
-                    $(this).removeClass('w3-white');
                     $(this).addClass('w3-dark-gray');
                     value_text.push(addIvItem($(this).text(), $(this).val()));
                     $(this).prop("selected", true);
                     value_option += $(this)[0].outerHTML;
                 } else {
                     $(this).prop("selected", false);
-                    $(this).addClass('w3-white');
                     $(this).removeClass('w3-dark-gray');
                 }
             } else {
                 if ($(this).val() == value) {
-                    $(this).removeClass('w3-white');
                     $(this).addClass('w3-dark-gray');
                     value_text.push(addIvItem($(this).text(), $(this).val()));
                     $(this).prop("selected", true);
                     value_option += $(this)[0].outerHTML;
                 } else {
                     $(this).prop("selected", false);
-                    $(this).addClass('w3-white');
                     $(this).removeClass('w3-dark-gray');
                 }
             }
@@ -590,8 +592,8 @@ $.fn.extend({
         value_el_class = "",
         options_container_class = "",
         options_container_style = {},
-        option_class = "w3-block w3-button w3-hover-blue w3-border-left w3-border-right",
-        option_style = "",
+        option_class = "",
+        option_style = {},
         keep_existing_class = 'toValue', // possible values: toView, toValue, toMain
         close_after_click = true,
         no_search_element = false
@@ -714,8 +716,10 @@ $.fn.extend({
             var options = select_el.children('option');
             options.last().addClass('w3-border-bottom');
             options.each(function() {
-                $(this).addClass(args.option_class);
-                $(this).attr('style', args.option_style);
+                $(this).addClass( iv_settings.options_el.classes );
+                $(this).css( iv_settings.options_el.styles );
+                $(this).addClass( args.option_class );
+                $(this).css( args.option_style );
             });
             options_container.append(options);
             
