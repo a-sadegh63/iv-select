@@ -16,7 +16,7 @@ const iv_settings = {
         styles: {
             position: 'relative',
         },
-        classes: 'iv-select w3-round'
+        classes: 'iv-select w3-white w3-round'
     },
     view_el: {
         styles: {
@@ -207,6 +207,7 @@ $(document).on('click', '.iv-select-options option', function(e) {
     var target_el = $(e.target);
     var value_el = target_el.iv_findElement( iv_elements.value_el );
     var search_el = target_el.iv_findElement( iv_elements.search_el );
+    var main_el = target_el.iv_findElement( iv_elements.main_el );
     if (value_el.prop('multiple') === true) {
         var current_value = value_el.val();
         if (!Array.isArray(current_value)) {
@@ -221,10 +222,14 @@ $(document).on('click', '.iv-select-options option', function(e) {
         value_el.val(target_el.val());
     }
     value_el.trigger('change');
-    if (target_el.data('iv_closeAfterClick')) {
+    if ( target_el.parent()[0].dataset.iv_close_after_click === 'true' ) {
         target_el.parent().hide(200);
     }
     search_el.val('');
+    main_el.css({
+        'border-bottom-right-radius': '',
+        'border-bottom-left-radius': '',
+    });
 });
 
 $(document).on('click', '.iv-del-button', function(e) {
@@ -273,6 +278,10 @@ $(document).on('click', function(e) {
         $('.iv-select-search:hover').length == 0
     ) {
         $('.iv-select-options').hide(200);
+        $('.iv-select').css({
+            'border-bottom-right-radius': '',
+            'border-bottom-left-radius': '',
+        });
     }
     if ( $(e.target).hasClass('iv-tooltip') ) {
         $('.iv-tooltip').hide('fade');
@@ -404,65 +413,68 @@ $.fn.extend({
         });
         return opt_values;
     },
-    iv_cloneSelect: 
+    iv_clone: 
     function({
         name = "",
         id = "",
         placeholder = "Select an option",
-        text_el_class = "",
-        text_el_style = "",
-        container_class = "",
-        container_style = "",
+        main_el_class = "",
+        main_el_style = {},
+        view_el_class = "",
+        view_el_style = {},
         options_container_class = "",
-        options_container_style = "",
+        options_container_style = {},
         option_class = "",
-        option_style = "",
+        option_style = {},
         remove_unselected = true,
         close_after_click = true
     } = {}) {
-        var iv_elements = this.iv_findElement( 'all' );
-        if ( iv_elements === false ) return false;
-        var value = iv_elements.value_el.val();
-        iv_elements.main_el.addClass( container_class );
-        iv_elements.main_el.css( iv_elements.main_el.attr('style') + container_style );
+        var main_el = this.iv_findElement( iv_elements.main_el );
+        if ( main_el === false ) return false;
+        var cloned_iv = main_el.clone().iv_findElement( 'all' );
+        var value = cloned_iv.value_el.val();
+        cloned_iv.main_el.addClass( main_el_class );
+        cloned_iv.main_el.css( main_el_style );
         if ( name != '' ) {
-            iv_elements.value_el.attr( 'name', name) ;
+            cloned_iv.value_el.attr( 'name', name ) ;
         } else {
-            iv_elements.value_el.removeAttr('name');
+            cloned_iv.value_el.removeAttr('name');
         }
         if ( id != '' ) {
-            iv_elements.value_el.attr('id', id);
+            cloned_iv.value_el.attr('id', id);
         } else {
-            iv_elements.value_el.removeAttr('id');
+            cloned_iv.value_el.removeAttr('id');
         }
-        if ( iv_elements.value_el.prop('multiple') === true ) {
-            iv_elements.options_container_el.children('option').each(function() {
-                $(this).attr('selected', true);
+
+        //fix cloned iv value 
+        if ( cloned_iv.value_el.prop('multiple') === true ) {
+            cloned_iv.value_el.children('option').each(function() {
+                $(this).attr( 'selected', true );
             });
         }
-        iv_elements.search_el.attr('placeholder', placeholder);
-        iv_elements.search_el.data('iv_placeholder', placeholder);
 
-        iv_elements.text_el.addClass( text_el_class );
-        iv_elements.text_el.css( iv_elements.text_el.attr('style') + text_el_style );
+        cloned_iv.search_el.attr('placeholder', placeholder);
+        cloned_iv.search_el.data('iv_placeholder', placeholder);
 
-        iv_elements.options_container_el.addClass( options_container_class );
-        iv_elements.options_container_el.css( iv_elements.options_container_el.attr('style') + options_container_style );
+        cloned_iv.view_el.addClass( view_el_class );
+        cloned_iv.view_el.css( view_el_style );
+
+        cloned_iv.options_container_el.addClass( options_container_class );
+        cloned_iv.options_container_el.css( options_container_style );
+        cloned_iv.options_container_el[0].dataset.iv_close_after_click = close_after_click;
 
         if ( remove_unselected ) {
-            iv_elements.options_container_el.children('option').filter(function() {
-                if ($(this).val() != value) {
+            cloned_iv.options_el.filter(function() {
+                if ( $(this).val() != value ) {
                     $(this).remove();
                 }
             });
         }
-        iv_elements.options_container_el.children('option').each(function() {
-            $(this).attr( 'style', $(this).attr('style') + option_style );
+        cloned_iv.options_el.each(function() {
+            $(this).css( option_style );
             $(this).addClass( option_class );
-            $(this).data( 'iv_closeAfterClick', close_after_click );
         });
-        var cloned_id = iv_elements.main_el.append( iv_elements.view_el, iv_elements.value_el, iv_elements.options_container_el );
-        return cloned_id;
+        return cloned_iv.main_el;
     },
     is_ivSelect: function() {
         if (!this.hasClass('iv-select-value')) return false;
@@ -568,19 +580,19 @@ $.fn.extend({
                 };
         }
     },
-    iv_selectConvert: function({
+    iv_selectConvert: 
+    function({
         placeholder = "Select an option",
-        text_el_class = "",
-        text_el_style = "",
-        class_for_search = "",
-        search_style = "",
-        class_for_value = "",
-        container_class = "w3-white",
+        main_el_class = "",
+        main_el_style = {},
+        view_el_class = "",
+        view_el_style = {},
+        value_el_class = "",
         options_container_class = "",
-        options_container_style = "",
+        options_container_style = {},
         option_class = "w3-block w3-button w3-hover-blue w3-border-left w3-border-right",
         option_style = "",
-        keep_existing_class = 'toValue', // possible values: toText, toValue, toContainer
+        keep_existing_class = 'toValue', // possible values: toView, toValue, toMain
         close_after_click = true,
         no_search_element = false
     } = {}) {
@@ -588,12 +600,11 @@ $.fn.extend({
         this.each(function() {
             var args = {
                 placeholder,
-                text_el_style,
-                text_el_class,
-                class_for_search,
-                search_style,
-                class_for_value,
-                container_class,
+                main_el_class,
+                main_el_style,
+                view_el_style,
+                view_el_class,
+                value_el_class,
                 options_container_class,
                 options_container_style,
                 option_class,
@@ -606,44 +617,56 @@ $.fn.extend({
             if (select_el[0].tagName != 'SELECT') return;
             if (select_el.hasClass('iv-select-value')) return;
 
-            //Determining the new iv-select element for existing class in the select element
-            var existing_class = select_el.attr('class');
-            if ( existing_class !== undefined && existing_class != '' ) {
-                switch (args.keep_existing_class) {
-                    case 'toValue':
-                        args.class_for_value += ' ' + existing_class;
-                        break;
-                    case 'toText':
-                        args.text_el_class += ' ' + existing_class;
-                        break;
-                    case 'toContainer':
-                        args.container_class += ' ' + existing_class;
-                        break;
-                }
-            }
-
             //add main element
             var iv_select = $('<div/>');
             iv_select.addClass( iv_settings.main_el.classes );
             iv_select.css( iv_settings.main_el.styles );
-            if ( args.container_class != '' ) {
-                iv_select.addClass( args.container_class );
-            }
+            iv_select.addClass( args.main_el_class );
+            iv_select.css( args.main_el_style );
 
             //add view element
             var view_element = $('<div/>');
             view_element.addClass( iv_settings.view_el.classes );
+            view_element.css( 'style', args.view_el_style );
+            view_element.addClass( args.view_el_class );
+
+            //add value element
+            var attributes = select_el[0].attributes;
+            var value_element = $('<select>');
+            $.each( attributes, function( index, attribute ) {
+                var attr_name = attribute.name;
+                var attr_value = attribute.nodeValue;
+                value_element.attr({ [attr_name]: attr_value });
+            });
+            value_element.css( iv_settings.value_el.styles );
+            value_element.addClass( iv_settings.value_el.classes );
+            value_element.addClass( args.value_el_class );
+            var multiple;
+            if (select_el.prop('multiple') === true) multiple = 'multiple';
+            value_element.attr({
+                multiple: multiple
+            });
+
+            //Determining the new iv-select element for existing class in the select element
+            var existing_class = select_el.attr('class');
+            if ( existing_class !== undefined && existing_class != '' ) {
+                switch ( args.keep_existing_class ) {
+                    case 'toValue':
+                        value_element.addClass( existing_class );
+                        break;
+                    case 'toView':
+                        view_element.addClass( existing_class );
+                        break;
+                    case 'toMain':
+                        iv_select.addClass( existing_class );
+                        break;
+                }
+            }
             
             //add text element
             var text_element = $('<div/>');
             text_element.addClass( iv_settings.text_el.classes );
             text_element.css( iv_settings.text_el.styles );
-            if ( args.text_el_style != '' ) {
-                text_element.attr( 'style', args.text_el_style );
-            }
-            if ( args.text_el_class != '' ) {
-                text_element.addClass( args.text_el_class );
-            }
 
             view_element.append( text_element );
             //add search element
@@ -655,12 +678,6 @@ $.fn.extend({
                 search_element[0].dataset.iv_placeholder = placeholder;
                 search_element.addClass( iv_settings.search_el.classes );
                 search_element.css( iv_settings.search_el.styles );
-                if ( args.search_style != '' ) {
-                    search_element.attr( 'style', search_element.attr('style') + args.search_style );
-                }
-                if ( class_for_search != '' ) {
-                    search_element.addClass( args.class_for_search );
-                }
                 text_element.append( search_element );
             } else {
                 text_element.css({width: '100%'});
@@ -674,32 +691,13 @@ $.fn.extend({
                 iv_select.attr('tabindex', tabindex);
                 select_el.removeAttr('tabindex');
             }
-            //add value element
-            var attributes = select_el[0].attributes;
-            var value_element = $('<select>');
-            $.each( attributes, function( index, attribute ) {
-                var attr_name = attribute.name;
-                var attr_value = attribute.nodeValue;
-                value_element.attr({ [attr_name]: attr_value });
-            });
-            value_element.css( iv_settings.value_el.styles );
-            value_element.addClass( iv_settings.value_el.classes );
-            if ( args.class_for_value != '' ) {
-                value_element.addClass( args.class_for_value );
-            }
-            var multiple;
-            if (select_el.prop('multiple') === true) multiple = 'multiple';
-            value_element.attr({
-                multiple: multiple
-            });
 
             //add option container element
-            var options_container = $('<div/>').attr({
-                class: 'iv-select-options ' + args.options_container_class,
-                style: 'display:none;position:absolute;width:100%;' + args.options_container_style,
-            });
+            var options_container = $('<div/>');
             options_container.addClass( iv_settings.options_container_el.classes );
             options_container.css( iv_settings.options_container_el.styles );
+            options_container.addClass( args.options_container_class );
+            options_container.css( args.options_container_style );
             if ( args.search_style != '' ) {
                 options_container.attr( 'style', options_container.attr('style') + args.options_container );
             }
@@ -710,16 +708,17 @@ $.fn.extend({
                     value: ''
                 })
             );
+            options_container[0].dataset.iv_close_after_click = args.close_after_click;
+
             //add options to container
             var options = select_el.children('option');
-            options.data('iv_closeAfterClick', args.close_after_click);
             options.last().addClass('w3-border-bottom');
             options.each(function() {
                 $(this).addClass(args.option_class);
                 $(this).attr('style', args.option_style);
             });
             options_container.append(options);
-
+            
             //add elements to the main container
             iv_select.append( view_element, value_element, options_container );
 
