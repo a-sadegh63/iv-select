@@ -16,26 +16,26 @@ const iv_settings = {
         styles: {
             position: 'relative',
         },
-        classes: 'iv-select w3-white w3-round'
+        classes: 'w3-white w3-round'
     },
     view_el: {
         styles: {
             
         },
-        classes: 'iv-select-view w3-row w3-padding-small'
+        classes: 'w3-row w3-padding-small'
     },
     text_el: {
         styles: {
             width: 'auto',
         },
-        classes: 'iv-select-text w3-col'
+        classes: 'w3-col'
     },
     search_el: {
         styles: {
             border: 'none',
             width: 'auto',
         },
-        classes: 'iv-select-search w3-col'
+        classes: 'w3-col'
     },
     value_el: {
         styles: {
@@ -50,20 +50,20 @@ const iv_settings = {
             'margin-right': '1px',
             'white-space': 'nowrap'
         },
-        classes: 'iv-selected-item w3-cell-row w3-col w3-card w3-blue-gray w3-round w3-small'
+        classes: 'w3-cell-row w3-col w3-card w3-blue-gray w3-round w3-small'
     },
     selected_item_text: {
         styles: {
             padding:'2px 8px'
         },
-        classes: 'iv-selected-item-text w3-cell'
+        classes: 'w3-cell'
     },
     delete_button: {
         styles: {
             padding:'2px 8px',
             'font-weight': 900
         },
-        classes: 'iv-del-button w3-hover-black w3-round w3-red w3-button w3-cell'
+        classes: 'w3-hover-black w3-round w3-red w3-button w3-cell'
     },
     options_container_el: {
         styles: {
@@ -85,7 +85,7 @@ const iv_settings = {
             'font-size': '13px',
             'background-color': 'white!important'
         },
-        classes: 'iv-select-options'
+        classes: 'w3-white'
     },
     options_el: {
         styles: {
@@ -298,24 +298,27 @@ function addIvItem(item_text, item_val) {
     if ( item_text == '' ) return '&nbsp;';
     //add container node
     var container_node = $('<div/>').attr({
-        class: iv_settings.item_el.classes
+        class: 'iv-selected-item'
     });
+    container_node.addClass( iv_settings.item_el.classes );
     container_node[0].dataset.iv_itemValue = item_val;
     container_node.css( iv_settings.item_el.styles );
 
     //add selected item text
     var text_node = $('<span/>').attr({
-        class: iv_settings.selected_item_text.classes,
+        class: 'iv-selected-item-text',
     });
+    text_node.addClass( iv_settings.selected_item_text.classes );
     text_node.css( iv_settings.selected_item_text.styles );
     text_node.html(item_text + '&nbsp;');
 
     //add delete button
     var btn_node = $('<button/>').attr({
-        class: iv_settings.delete_button.classes,
+        class: 'iv-del-button',
         style: 'padding:2px 8px;font-weight:900',
         type: 'button'
     });
+    btn_node.addClass( iv_settings.delete_button.classes );
     btn_node.css( iv_settings.delete_button.styles );
     btn_node.html('&times;');
     
@@ -372,6 +375,26 @@ function addIvItem(item_text, item_val) {
             iv_search_el.removeAttr('placeholder');
         }
         iv_search_el.val('');
+        //fix search element width
+        const min_width = 80;
+        const available_width = iv_text_el.width();
+        const total_width = iv_text_el.children('.iv-selected-item').map( function() {
+            return $(this).width();
+        }).get()
+        .reduce((partialSum, a) => partialSum + a, 0);
+        var calc_width = 0;
+        if ( total_width > available_width ) {
+            calc_width = total_width % available_width - 7;
+        } else {
+            calc_width = available_width - total_width - 7;
+        }
+        if ( calc_width >= min_width ) {
+            iv_search_el.css( 'width', calc_width );
+        } else {
+            console.log(this.iv_findElement( iv_elements.main_el ));
+            console.log(total_width);
+        }
+
         originalFn.apply(this, arguments);
     };
 })(jQuery);
@@ -621,6 +644,7 @@ $.fn.extend({
 
             //add main element
             var iv_select = $('<div/>');
+            iv_select.addClass( 'iv-select' );
             iv_select.addClass( iv_settings.main_el.classes );
             iv_select.css( iv_settings.main_el.styles );
             iv_select.addClass( args.main_el_class );
@@ -628,6 +652,7 @@ $.fn.extend({
 
             //add view element
             var view_element = $('<div/>');
+            view_element.addClass( 'iv-select-view' );
             view_element.addClass( iv_settings.view_el.classes );
             view_element.css( 'style', args.view_el_style );
             view_element.addClass( args.view_el_class );
@@ -667,6 +692,7 @@ $.fn.extend({
             
             //add text element
             var text_element = $('<div/>');
+            text_element.addClass( 'iv-select-text' );
             text_element.addClass( iv_settings.text_el.classes );
             text_element.css( iv_settings.text_el.styles );
 
@@ -678,6 +704,7 @@ $.fn.extend({
                     placeholder: args.placeholder
                 });
                 search_element[0].dataset.iv_placeholder = placeholder;
+                search_element.addClass( 'iv-select-search' );
                 search_element.addClass( iv_settings.search_el.classes );
                 search_element.css( iv_settings.search_el.styles );
                 text_element.append( search_element );
@@ -695,14 +722,14 @@ $.fn.extend({
             }
 
             //add option container element
-            var options_container = $('<div/>');
+            var options_container = $('<div/>').attr({
+                class: 'iv-select-options'
+            });
             options_container.addClass( iv_settings.options_container_el.classes );
             options_container.css( iv_settings.options_container_el.styles );
             options_container.addClass( args.options_container_class );
             options_container.css( args.options_container_style );
-            if ( args.search_style != '' ) {
-                options_container.attr( 'style', options_container.attr('style') + args.options_container );
-            }
+
             //add value null option
             options_container.append(
                 $('<option/>').attr({
