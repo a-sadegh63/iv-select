@@ -100,6 +100,9 @@ const iv_settings = {
             "border-left": "1px solid #ccc !important",
             "border-bottom": "hidden",
         },
+        ".iv-select-view": {
+            "cursor": "text",
+        },
         ".iv-select-search:focus": {
             "outline": "none",
         },
@@ -150,6 +153,7 @@ $(document).on('click', '.iv-select-view', function(e) {
     var main_el = target_el.iv_findElement( iv_elements.main_el );
     var options_container = target_el.iv_findElement( iv_elements.options_container_el );
     var value_el = target_el.iv_findElement( iv_elements.value_el );
+    target_el.iv_findElement( iv_elements.search_el ).focus();
     if ( value_el.prop('disabled') ) return;
     if ( options_container.is(":visible") ) {
         options_container.hide(200, function() {
@@ -265,8 +269,9 @@ $(document).on('click', '.iv-del-button', function(e) {
 
 $(document).on('keyup', 'input.iv-select-search', function(e) {
     var target = $(e.target);
+    target.width( target.prop('scrollWidth') );
     var search = target.val();
-    var options = target.iv_findElement( iv_elements.options_container_el ).children('option');
+    var options = target.iv_findElement( iv_elements.options_el );
     options.removeClass('w3-border-bottom');
     options.hide();
     const result = options.filter(index => $(options[index]).text().toLowerCase().indexOf(search.toLowerCase()) > -1);
@@ -288,6 +293,12 @@ $(document).on('click', function(e) {
             'border-bottom-right-radius': '',
             'border-bottom-left-radius': '',
         });
+        $('input.iv-select-search').map( function () {
+            if ( $(this).val() != '' ) {
+                $(this).val('');
+                $(this).trigger('keyup');
+            }
+        })
     }
     if ( $(e.target).hasClass('iv-tooltip') ) {
         $('.iv-tooltip').hide('fade');
@@ -370,31 +381,13 @@ function addIvItem(item_text, item_val) {
         iv_text_el.empty().append( value_text );
         iv_text_el.append( iv_search_el );
         if ( ! value || value.length === 0 ) {
+            iv_search_el.width( 'auto' );
             iv_search_el.attr( 'placeholder', iv_search_el[0].dataset.iv_placeholder );
         } else {
+            iv_search_el.css( 'width', '0.75em' );
             iv_search_el.removeAttr('placeholder');
         }
         iv_search_el.val('');
-        //fix search element width
-        const min_width = 80;
-        const available_width = iv_text_el.width();
-        const total_width = iv_text_el.children('.iv-selected-item').map( function() {
-            return $(this).width();
-        }).get()
-        .reduce((partialSum, a) => partialSum + a, 0);
-        var calc_width = 0;
-        if ( total_width > available_width ) {
-            calc_width = total_width % available_width - 7;
-        } else {
-            calc_width = available_width - total_width - 7;
-        }
-        if ( calc_width >= min_width ) {
-            iv_search_el.css( 'width', calc_width );
-        } else {
-            console.log(this.iv_findElement( iv_elements.main_el ));
-            console.log(total_width);
-        }
-
         originalFn.apply(this, arguments);
     };
 })(jQuery);
