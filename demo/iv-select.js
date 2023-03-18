@@ -236,6 +236,7 @@ $(document).on('click', '.iv-select-options option', function(e) {
         target_el.parent().hide(200);
     }
     search_el.val('');
+    search_el.trigger('keyup');
     main_el.css({
         'border-bottom-right-radius': '',
         'border-bottom-left-radius': '',
@@ -388,6 +389,7 @@ function addIvItem(item_text, item_val) {
             iv_search_el.removeAttr('placeholder');
         }
         iv_search_el.val('');
+        iv_search_el.trigger('keyup');
         originalFn.apply(this, arguments);
     };
 })(jQuery);
