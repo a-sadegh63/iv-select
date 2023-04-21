@@ -22,7 +22,7 @@ const iv_settings = {
         styles: {
             
         },
-        classes: 'w3-row w3-padding-small'
+        classes: 'w3-row w3-padding-small' //must fixed **************************************************************************
     },
     text_el: {
         styles: {
@@ -112,6 +112,8 @@ const iv_settings = {
         }
     }
 }
+
+const bar_class = 'w3-bar-item';
 
 $(document).ready(function() {
     var elem = $('.iv-select-search')[0];
@@ -672,6 +674,12 @@ $.fn.extend({
             //Determining the new iv-select element for existing class in the select element
             var existing_class = select_el.attr('class');
             if ( existing_class !== undefined && existing_class != '' ) {
+                var re = new RegExp('\\b' + bar_class + '\\b', 'gi');
+                if ( existing_class.match(re) ) {
+                    existing_class.replace( re, '' );
+                    iv_select.addClass( bar_class );
+                    iv_select.css( 'position', 'static' );
+                }
                 switch ( args.keep_existing_class ) {
                     case 'toValue':
                         value_element.addClass( existing_class );
