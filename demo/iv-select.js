@@ -109,6 +109,9 @@ const iv_settings = {
         ".iv-select-options option": {
             "padding": "2px 0px!important",
             "text-align": "inherit",
+        },
+        ".iv-option-focused": {
+            "background-color": "lightblue"
         }
     }
 }
@@ -143,7 +146,105 @@ $(document).ready(function() {
     $('head').append( inline_css_obj );
 });
 
-$(document).on('click', '.iv-select-view', function(e) {
+$(document).on('click', '.iv-select-topbar', function(e) {
+    var iv_width = $(this).outerWidth();
+    var options_container = $(this).iv_findElement( iv_elements.options_container_el );
+    options_container.css( 'max-width', iv_width );
+    options_container.css( 'top', $(this).offset().top + $(this).outerHeight() );
+    options_container.css( 'left', $(this).offset().left );
+});
+
+$(document).on('keydown', '.iv-select-view', function(e) {
+    var target_el = $(e.target);
+    var options_container = target_el.iv_findElement( iv_elements.options_container_el );
+    var value_el = target_el.iv_findElement( iv_elements.value_el );
+    if ( value_el.prop('disabled') ) return;
+    if ( options_container.is(":visible") ) {
+        var key_code = e.keyCode || e.which;
+        keyboardFocus( options_container, key_code );
+    }
+});
+
+function keyboardFocus( options_container, key_code ) {
+    const container_top = options_container.offset().top;
+    var new_focus_el, old_focus_el;
+    old_focus_el = $();
+    if ( key_code == 38 ) { //up key pressed
+        if ( options_container.children('.iv-option-focused').length != 0 ) {
+            old_focus_el = options_container.children('.iv-option-focused');
+            new_focus_el = options_container.children('.iv-option-focused').prevAll(':visible:first');
+            if ( new_focus_el.length == 0 ) {
+                new_focus_el = options_container.find(':visible:last');
+            }
+        } else {
+            if ( options_container[0].scrollTop > 0 ) {
+                options_container.find(':visible').each( function () {
+                    if ( $(this).offset().top - container_top <= $(this).outerHeight() ) {
+                        new_focus_el = $(this);
+                    }
+                });
+            } else {
+                new_focus_el = options_container.find(':visible:last');
+            }
+        }
+    }
+    if ( key_code == 40 ) { //down key pressed
+        if ( options_container.children('.iv-option-focused').length != 0 ) {
+            old_focus_el = options_container.children('.iv-option-focused');
+            new_focus_el = options_container.children('.iv-option-focused').nextAll(':visible:first');
+            if ( new_focus_el.length == 0 ) {
+                new_focus_el = options_container.find(':visible:first');
+            }
+        } else {
+            if ( options_container[0].scrollTop > 0 ) {
+                options_container.find(':visible').each( function () {
+                    if ( $(this).offset().top - container_top <= $(this).outerHeight() ) {
+                        new_focus_el = $(this);
+                    }
+                });
+            } else {
+                new_focus_el = options_container.find(':visible:first');
+            }
+        }
+    }
+    if ( key_code == 40 || key_code == 38 ) {
+        old_focus_el.removeClass('iv-option-focused');
+        new_focus_el.addClass('iv-option-focused');
+        options_container.scrollTop( options_container[0].scrollTop + new_focus_el.offset().top - container_top );
+        options_container.children().css( 'pointer-events', 'none' );
+    }
+}
+
+$(document).on('keyup', '.iv-select-view', function(e) {
+    var key_code = e.keyCode || e.which;
+    if ( key_code == 40 || key_code == 38 ) {
+        return;
+    }
+    var target_el = $(e.target);
+    var options_container = target_el.iv_findElement( iv_elements.options_container_el );
+    const container_top = options_container.offset().top;
+    var focus_el = $();
+    if ( key_code == 36 ) { //home key pressed
+        focus_el = options_container.find(':visible:first');
+    }
+    if ( key_code == 35 ) { //end key pressed
+        focus_el = options_container.find(':visible:last');
+    }
+    options_container.children().removeClass('iv-option-focused');
+    if ( focus_el.length > 0 ) {
+        focus_el.addClass('iv-option-focused');
+        options_container.scrollTop( options_container[0].scrollTop + focus_el.offset().top - container_top );
+    }
+    if ( key_code == 13 ) { //enter key pressed
+        //************************************************************** */
+        //multiple iv-selects must reviewed
+        if ( options_container.children('.iv-option-focused').length > 0 ) {
+            var value_el = target_el.iv_findElement( iv_elements.value_el );
+        }
+    }
+});
+
+$(document).on('click', '.iv-select', function(e) {
     var target_el = $(e.target);
     if ( 
         target_el.hasClass('iv-selected-item-text') || 
@@ -152,8 +253,9 @@ $(document).on('click', '.iv-select-view', function(e) {
     ) {
         return;
     }
-    var main_el = target_el.iv_findElement( iv_elements.main_el );
+    var main_el = target_el;
     var options_container = target_el.iv_findElement( iv_elements.options_container_el );
+    $('.iv-select-options').not(options_container[0]).hide(); //hide other options containers
     var value_el = target_el.iv_findElement( iv_elements.value_el );
     target_el.iv_findElement( iv_elements.search_el ).focus();
     if ( value_el.prop('disabled') ) return;
@@ -171,6 +273,7 @@ $(document).on('click', '.iv-select-view', function(e) {
                 'border-bottom-left-radius': '0px',
             });
         });
+        options_container[0].scrollTop = 0;
     }
 });
 
@@ -220,6 +323,7 @@ $(document).on('click', '.iv-select-options option', function(e) {
     var value_el = target_el.iv_findElement( iv_elements.value_el );
     var search_el = target_el.iv_findElement( iv_elements.search_el );
     var main_el = target_el.iv_findElement( iv_elements.main_el );
+    const main_width = main_el.outerWidth();
     if (value_el.prop('multiple') === true) {
         var current_value = value_el.val();
         if (!Array.isArray(current_value)) {
@@ -243,6 +347,7 @@ $(document).on('click', '.iv-select-options option', function(e) {
         'border-bottom-right-radius': '',
         'border-bottom-left-radius': '',
     });
+    main_el.css( 'min-width', main_width ); //fix width when option width is shorter than initial width
 });
 
 $(document).on('click', '.iv-del-button', function(e) {
@@ -272,6 +377,9 @@ $(document).on('click', '.iv-del-button', function(e) {
 
 $(document).on('keyup', 'input.iv-select-search', function(e) {
     var target = $(e.target);
+    if ( $.inArray(e.keyCode, [37, 38, 39, 40, 8, 9, 13, 16, 17, 18, 20]) ) {
+        return;
+    }
     target.width( target.prop('scrollWidth') );
     var search = target.val();
     var options = target.iv_findElement( iv_elements.options_el );
@@ -284,6 +392,7 @@ $(document).on('keyup', 'input.iv-select-search', function(e) {
 
 $(document).on('click', function(e) {
     if (
+        $('.iv-select:hover').length == 0 &&
         $('.iv-select-options:hover').length == 0 &&
         $('.iv-select-view:hover').length == 0 &&
         $('.iv-selected-item:hover').length == 0 &&
@@ -301,11 +410,16 @@ $(document).on('click', function(e) {
                 $(this).val('');
                 $(this).trigger('keyup');
             }
-        })
+        });
+        $('.iv-select').css( 'min-width', 'unset' );
     }
     if ( $(e.target).hasClass('iv-tooltip') ) {
         $('.iv-tooltip').hide('fade');
     }
+    $('.iv-option-focused').each( function() {
+        $(this).removeClass('iv-option-focused');
+    });
+    $('.iv-select-options').children().css( 'pointer-events', 'unset' );
 });
 
 function addIvItem(item_text, item_val) {
@@ -678,6 +792,8 @@ $.fn.extend({
                 if ( existing_class.match(re) ) {
                     existing_class.replace( re, '' );
                     iv_select.addClass( bar_class );
+                    iv_select.addClass( 'iv-select-topbar' );
+                    view_element.removeClass( 'w3-padding-small' );
                     iv_select.css( 'position', 'static' );
                 }
                 switch ( args.keep_existing_class ) {
