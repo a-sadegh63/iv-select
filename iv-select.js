@@ -215,9 +215,13 @@ function addIvItem(item_text, item_val) {
 
 $.fn.extend({
     iv_updateOptions: function(new_options) {
-        if (!this.hasClass('iv-select-value')) return;
+        if ( ! this.hasClass('iv-select-value') ) return;
         var options_container = this.nextAll('div.iv-select-options');
         options_container.empty().append(new_options);
+        options_container.children('option').each( function () {
+            $(this).addClass('w3-block w3-button w3-hover-blue w3-border-left w3-border-right w3-white');
+        });
+
     },
     iv_getOptions: function() {
         if (!this.hasClass('iv-select-value')) return;

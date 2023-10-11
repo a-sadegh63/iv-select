@@ -25,7 +25,7 @@
 
 .iv-select-options option {
   padding:2px 0px!important;
-  text-align:left;
+  text-align: inherit;
 }
 
 .inline-input {
