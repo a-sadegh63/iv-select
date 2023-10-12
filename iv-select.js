@@ -5,6 +5,10 @@ $(document).on('click', '.iv-select-text', function(e) {
     }
     if ( target_el.next('.iv-select-value').prop('disabled') ) return;
     ivSelectDropDown( target_el, true );
+    var options_container = target_el.nextAll('div.iv-select-options');
+    if ( ! options_container.is(':hidden') ) {
+        options_container.children('option.w3-light-gray')[0].scrollIntoView()
+    };
 });
 
 function ivSelectDropDown(iv_input, clear_filter = true) {
@@ -87,7 +91,7 @@ $(document).on('click', '.iv-select-options option', function(e) {
         value_el.val(target_el.val());
     }
     value_el.trigger('change');
-    if (target_el.data('iv_closeAfterClick')) {
+    if (target_el.parent().data('iv_closeAfterClick')) {
         target_el.parent().hide(200);
     }
     search_el.val('');
@@ -221,7 +225,12 @@ $.fn.extend({
         options_container.children('option').each( function () {
             $(this).addClass('w3-block w3-button w3-hover-blue w3-border-left w3-border-right w3-white');
         });
-
+        options_container.append(
+            $('<option/>').attr({
+                class: 'w3-hide',
+                value: ''
+            })
+        );
     },
     iv_getOptions: function() {
         if (!this.hasClass('iv-select-value')) return;
@@ -290,6 +299,7 @@ $.fn.extend({
             class: 'iv-select-options ' + options_container_class,
             style: options_container_style
         });
+        cloned_iv.children('div.iv-select-options').data('iv_closeAfterClick', close_after_click);
         if (remove_unselected) {
             cloned_iv.children('div.iv-select-options').children('option').filter(function() {
                 if ($(this).val() != value) {
@@ -300,7 +310,6 @@ $.fn.extend({
         cloned_iv.children('div.iv-select-options').children('option').each(function() {
             $(this).attr('style', option_style);
             $(this).addClass(option_class);
-            $(this).data('iv_closeAfterClick', close_after_click);
         });
         return cloned_iv;
     },
@@ -414,7 +423,7 @@ $.fn.extend({
                 });
                 options_container.append(search_element);
             }
-            options.data('iv_closeAfterClick', args.close_after_click);
+            options_container.data('iv_closeAfterClick', args.close_after_click);
             options_container.append(
                 $('<option/>').attr({
                     class: 'w3-hide',
