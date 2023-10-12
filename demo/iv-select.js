@@ -377,10 +377,9 @@ $(document).on('click', '.iv-del-button', function(e) {
 
 $(document).on('keyup', 'input.iv-select-search', function(e) {
     var target = $(e.target);
-    if ( $.inArray(e.keyCode, [37, 38, 39, 40, 8, 9, 13, 16, 17, 18, 20]) ) {
-        return;
+    if ( $.inArray(e.keyCode, [37, 38, 39, 40, 8, 9, 13, 16, 17, 18, 20]) != -1 ) {
+        target.width( target.prop('scrollWidth') );
     }
-    target.width( target.prop('scrollWidth') );
     var search = target.val();
     var options = target.iv_findElement( iv_elements.options_el );
     options.removeClass('w3-border-bottom');
