@@ -531,9 +531,9 @@ $.fn.extend({
     function( new_options ) {
         var options_container = this.iv_findElement( iv_elements.options_container_el );
         if ( options_container !== false ) {
-            options_container.empty();
+            options_container.empty().append(new_options);;
             //add value null option
-            if ( new_options.first().val() != '' ) {
+            if ( options_container.first().val() != '' ) {
                 options_container.append(
                     $('<option/>').attr({
                         class: 'w3-hide',
@@ -541,7 +541,6 @@ $.fn.extend({
                     })
                 );
             }
-            options_container.append( new_options );
             options_container.children('option').each( function () {
                 $(this).addClass( iv_settings.options_el.classes );
             });    
