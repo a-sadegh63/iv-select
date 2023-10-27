@@ -12,6 +12,7 @@ const iv_elements = {
 };
 
 const iv_settings = {
+    placeholder: 'Select an option',
     main_el: {
         styles: {
             position: 'relative',
@@ -27,13 +28,15 @@ const iv_settings = {
     text_el: {
         styles: {
             width: 'auto',
+            display: 'flex',
+            'align-items': 'center'
         },
         classes: 'w3-col'
     },
     search_el: {
         styles: {
             border: 'none',
-            width: 'auto',
+            width: 'auto'
         },
         classes: 'w3-col'
     },
@@ -70,7 +73,7 @@ const iv_settings = {
             display: 'none',
             position: 'absolute',
             width: '100%',
-            'max-height': '200px',
+            'max-height': '235px',
             'z-index': '10',
             'overflow-y': 'auto',
             'overflow-x': 'hidden',
@@ -89,7 +92,7 @@ const iv_settings = {
     },
     options_el: {
         styles: {
-
+            height: '23.5px'
         },
         classes: 'w3-block w3-button w3-hover-blue w3-border-left w3-border-right'
     },
@@ -112,26 +115,17 @@ const iv_settings = {
         },
         ".iv-option-focused": {
             "background-color": "lightblue"
+        },
+        '.w3-col': {
+            'float': 'inherit'
         }
+
     }
 }
 
 const bar_class = 'w3-bar-item';
 
 $(document).ready(function() {
-    var elem = $('.iv-select-search')[0];
-    var page_dir;
-    if ( window.getComputedStyle ) { // all browsers
-        page_dir = window.getComputedStyle( elem, null ).getPropertyValue( 'direction' );
-    } else {
-        page_dir = elem.currentStyle.direction; // IE5-8
-    }
-    if ( page_dir == 'rtl' ) {
-        iv_settings.inline_styles['.w3-col'] = {
-            'float': 'right'
-        }
-    }
-
     //add inline styles
     var inline_css = '';
     for ( var css_selector in iv_settings.inline_styles ) {
@@ -230,17 +224,29 @@ $(document).on('keyup', '.iv-select-view', function(e) {
     if ( key_code == 35 ) { //end key pressed
         focus_el = options_container.find(':visible:last');
     }
-    options_container.children().removeClass('iv-option-focused');
+    // options_container.children().removeClass('iv-option-focused');
     if ( focus_el.length > 0 ) {
         focus_el.addClass('iv-option-focused');
         options_container.scrollTop( options_container[0].scrollTop + focus_el.offset().top - container_top );
     }
     if ( key_code == 13 ) { //enter key pressed
-        //************************************************************** */
-        //multiple iv-selects must reviewed
         if ( options_container.children('.iv-option-focused').length > 0 ) {
             var value_el = target_el.iv_findElement( iv_elements.value_el );
+            var focused_value = options_container.children('.iv-option-focused').val();
+            var old_values = value_el.val();
+            if ( value_el.prop('multiple') === true ) {
+                if ( old_values.length != 0 ) {
+                    const found = old_values.find( (element) => element == focused_value );
+                    if ( found === undefined ) {
+                        old_values.push(focused_value);
+                    }
+                }
+            } else {
+                old_values = focused_value;
+            }
+            value_el.val(old_values);
         }
+        options_container.hide( 200 );
     }
 });
 
@@ -254,10 +260,14 @@ $(document).on('click', '.iv-select', function(e) {
         return;
     }
     var main_el = target_el;
-    var options_container = target_el.iv_findElement( iv_elements.options_container_el );
-    $('.iv-select-options').not(options_container[0]).hide(); //hide other options containers
-    var value_el = target_el.iv_findElement( iv_elements.value_el );
     target_el.iv_findElement( iv_elements.search_el ).focus();
+    ivDropOptionsDown( main_el );
+});
+
+function ivDropOptionsDown( main_el ) {
+    var options_container = main_el.iv_findElement( iv_elements.options_container_el );
+    $('.iv-select-options').not(options_container[0]).hide(); //hide other options containers
+    var value_el = main_el.iv_findElement( iv_elements.value_el );
     if ( value_el.prop('disabled') ) return;
     if ( options_container.is(":visible") ) {
         options_container.hide(200, function() {
@@ -273,9 +283,15 @@ $(document).on('click', '.iv-select', function(e) {
                 'border-bottom-left-radius': '0px',
             });
         });
-        options_container[0].scrollTop = 0;
+        if ( options_container.children('.w3-dark-gray').length != 0 ) {
+            options_container.scrollTop(
+                options_container.children('.w3-dark-gray')[0].offsetTop
+            );            
+        } else {
+            options_container[0].scrollTop = 0;
+        }
     }
-});
+}
 
 const ivSelectOninvalid = (iv_value_dom, err_message) => {
     var text_el = $(iv_value_dom).iv_textEl();
@@ -377,16 +393,21 @@ $(document).on('click', '.iv-del-button', function(e) {
 
 $(document).on('keyup', 'input.iv-select-search', function(e) {
     var target = $(e.target);
-    if ( $.inArray(e.keyCode, [37, 38, 39, 40, 8, 9, 13, 16, 17, 18, 20]) != -1 ) {
-        target.width( target.prop('scrollWidth') );
+    if ( $.inArray(e.keyCode, [37, 38, 39, 40, 9, 13, 16, 17, 18, 20]) != -1 ) {
+        return;
     }
+    target.width( target.prop('scrollWidth') );
     var search = target.val();
     var options = target.iv_findElement( iv_elements.options_el );
+    var options_container = target.iv_findElement( iv_elements.options_container_el );
     options.removeClass('w3-border-bottom');
-    options.hide();
     const result = options.filter(index => $(options[index]).text().toLowerCase().indexOf(search.toLowerCase()) > -1);
-    result.show();
-    result.last().addClass('w3-border-bottom');
+    if ( result.length != 0 ) {
+        options.hide();
+        options_container.show();
+        result.show();
+        result.last().addClass('w3-border-bottom');
+    } 
 });
 
 $(document).on('click', function(e) {
@@ -455,7 +476,7 @@ function addIvItem(item_text, item_val) {
 (function($) {
     var originalFn = $.fn.val;
     $.fn.val = function(value) {
-        if (!this.hasClass('iv-select-value') || value === undefined) return originalFn.apply(this, arguments);
+        if ( ! this.hasClass('iv-select-value') || value === undefined ) return originalFn.apply(this, arguments);
         var options = this.iv_findElement( iv_elements.options_container_el ).children('option'); 
         var iv_text_el = this.iv_findElement( iv_elements.text_el ); 
         var iv_search_el = this.iv_findElement( iv_elements.search_el );
@@ -518,9 +539,9 @@ $.fn.extend({
     function( new_options ) {
         var options_container = this.iv_findElement( iv_elements.options_container_el );
         if ( options_container !== false ) {
-            options_container.empty();
+            options_container.empty().append(new_options);;
             //add value null option
-            if ( new_options.first().val() != '' ) {
+            if ( options_container.first().val() != '' ) {
                 options_container.append(
                     $('<option/>').attr({
                         class: 'w3-hide',
@@ -528,7 +549,9 @@ $.fn.extend({
                     })
                 );
             }
-            options_container.append( new_options );
+            options_container.children('option').each( function () {
+                $(this).addClass( iv_settings.options_el.classes );
+            });    
         }
     },
     iv_getPossibleValues: 
@@ -717,7 +740,7 @@ $.fn.extend({
     },
     iv_selectConvert: 
     function({
-        placeholder = "Select an option",
+        placeholder = iv_settings.placeholder,
         main_el_class = "",
         main_el_style = {},
         view_el_class = "",
@@ -828,7 +851,8 @@ $.fn.extend({
                 text_element.append( search_element );
             } else {
                 text_element.css({width: '100%'});
-                iv_select.css({'min-width': '100px', padding:'7px 8px'});
+                if ( main_el_style['min-width'] === undefined ) iv_select.css({'min-width': '100px'});
+                if ( main_el_style.padding === undefined ) iv_select.css({padding:'7px 8px'});
             }
 
             //start convert to iv-select

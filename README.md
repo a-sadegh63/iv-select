@@ -4,9 +4,10 @@ iv-select is a simple, light and fast jQuery replacement for html select boxes
 ***Key Features of iv_select***  
 * Enhancing native selects with search.  
 * Enhancing native selects with a better multi-select interface.  
-* Extremely simple and light. only 16.7 kB. (11.9 kB minified version)
+* Extremely simple and light. only 36 kB. (22.5 kB minified version)
 * Styled with [w3.css](https://www.w3schools.com/w3css/default.asp)  
 * Use native jQuery val function to set select value  
+* Use the iv_settings object to hold project properties and every element's settings and styles  
 * Use tooltip to handle invalid user enties  
 * Various extended functions
   
@@ -21,7 +22,10 @@ iv-select is a simple, light and fast jQuery replacement for html select boxes
 `$('#select-id').val(['volvo', 'saab']); //set value of a multiple HTML select`  
 3. **Initialize value**  
 to set initialize value (default value) for iv_select, you must have a data-iv-init-value attribute in the HTML select before converting it to iv_select.  
-  
+4. **Override settings globally**
+The iv select uses the iv_settings object to hold project properties and every element's settings and styles. If you override every property of the
+iv_settings object, the settings globally changed for each iv select
+
 ***Function Reference***  
 | function          | arguments                                                                             | return value                                        |
 |-------------------|---------------------------------------------------------------------------------------|-----------------------------------------------------|
