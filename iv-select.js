@@ -260,10 +260,14 @@ $(document).on('click', '.iv-select', function(e) {
         return;
     }
     var main_el = target_el;
-    var options_container = target_el.iv_findElement( iv_elements.options_container_el );
-    $('.iv-select-options').not(options_container[0]).hide(); //hide other options containers
-    var value_el = target_el.iv_findElement( iv_elements.value_el );
     target_el.iv_findElement( iv_elements.search_el ).focus();
+    ivDropOptionsDown( main_el );
+});
+
+function ivDropOptionsDown( main_el ) {
+    var options_container = main_el.iv_findElement( iv_elements.options_container_el );
+    $('.iv-select-options').not(options_container[0]).hide(); //hide other options containers
+    var value_el = main_el.iv_findElement( iv_elements.value_el );
     if ( value_el.prop('disabled') ) return;
     if ( options_container.is(":visible") ) {
         options_container.hide(200, function() {
@@ -287,7 +291,7 @@ $(document).on('click', '.iv-select', function(e) {
             options_container[0].scrollTop = 0;
         }
     }
-});
+}
 
 const ivSelectOninvalid = (iv_value_dom, err_message) => {
     var text_el = $(iv_value_dom).iv_textEl();
@@ -389,17 +393,21 @@ $(document).on('click', '.iv-del-button', function(e) {
 
 $(document).on('keyup', 'input.iv-select-search', function(e) {
     var target = $(e.target);
-    if ( $.inArray(e.keyCode, [37, 38, 39, 40, 8, 9, 13, 16, 17, 18, 20]) ) {
+    if ( $.inArray(e.keyCode, [37, 38, 39, 40, 9, 13, 16, 17, 18, 20]) != -1 ) {
         return;
     }
     target.width( target.prop('scrollWidth') );
     var search = target.val();
     var options = target.iv_findElement( iv_elements.options_el );
+    var options_container = target.iv_findElement( iv_elements.options_container_el );
     options.removeClass('w3-border-bottom');
-    options.hide();
     const result = options.filter(index => $(options[index]).text().toLowerCase().indexOf(search.toLowerCase()) > -1);
-    result.show();
-    result.last().addClass('w3-border-bottom');
+    if ( result.length != 0 ) {
+        options.hide();
+        options_container.show();
+        result.show();
+        result.last().addClass('w3-border-bottom');
+    } 
 });
 
 $(document).on('click', function(e) {
