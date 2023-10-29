@@ -539,9 +539,9 @@ $.fn.extend({
     function( new_options ) {
         var options_container = this.iv_findElement( iv_elements.options_container_el );
         if ( options_container !== false ) {
-            options_container.empty().append(new_options);;
+            options_container.empty().append(new_options);
             //add value null option
-            if ( options_container.first().val() != '' ) {
+            if ( options_container.children().first().val() != '' ) {
                 options_container.append(
                     $('<option/>').attr({
                         class: 'w3-hide',
