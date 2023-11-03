@@ -21,22 +21,24 @@ const iv_settings = {
     },
     view_el: {
         styles: {
-            
+            padding: '8px'
         },
-        classes: 'w3-row w3-padding-small' //must fixed **************************************************************************
+        classes: 'w3-row'
     },
     text_el: {
         styles: {
             width: 'auto',
             display: 'flex',
-            'align-items': 'center'
+            'align-items': 'center',
+            'flex-wrap': 'wrap',
+            'flex-item': ''
         },
         classes: 'w3-col'
     },
     search_el: {
         styles: {
             border: 'none',
-            width: 'auto'
+            'align-self': 'flex-start'
         },
         classes: 'w3-col'
     },
@@ -51,7 +53,6 @@ const iv_settings = {
             'width': 'fit-content',
             'margin-left': '1px',
             'margin-right': '1px',
-            'white-space': 'nowrap'
         },
         classes: 'w3-cell-row w3-col w3-card w3-blue-gray w3-round w3-small'
     },
@@ -255,12 +256,14 @@ $(document).on('click', '.iv-select', function(e) {
     if ( 
         target_el.hasClass('iv-selected-item-text') || 
         target_el.hasClass('iv-del-button') ||
-        target_el.hasClass('iv-selected-item')
+        target_el.hasClass('iv-selected-item') ||
+        target_el.hasClass('iv-tooltip')
     ) {
         return;
     }
     var main_el = target_el;
     target_el.iv_findElement( iv_elements.search_el ).focus();
+    $('.iv-tooltip').hide('fade');
     ivDropOptionsDown( main_el );
 });
 
@@ -294,19 +297,19 @@ function ivDropOptionsDown( main_el ) {
 }
 
 const ivSelectOninvalid = (iv_value_dom, err_message) => {
-    var text_el = $(iv_value_dom).iv_textEl();
+    var text_el = $(iv_value_dom).iv_findElement( iv_elements.view_el );
     text_el.attr( 'title', err_message );
-    var position = text_el.offset();
+    var view_width = text_el.outerWidth();
     if ( text_el.next('span.iv-tooltip').length != 0 ) {
         text_el.next('span.iv-tooltip').remove();
     }
     text_el.after( 
-        $('<span style="position:absolute;background-color:#42414d;color:white;' + 
-          'font-size:13px;padding:18px;left:' + position.left + 'px;width:250px"' + 
+        $('<span style="position:absolute;background-color:rgb(30, 29, 34);color:white;' + 
+          'font-size:13px;padding:18px;width:' + view_width + 'px;min-width:250px"' + 
           ' class="iv-tooltip w3-round-large">' + err_message + '</span>') 
     );
     $(iv_value_dom).on( 'invalid', function () {
-        var text_el = $(iv_value_dom).iv_textEl();
+        var text_el = $(iv_value_dom).iv_findElement( iv_elements.view_el );
         if ( text_el.next('span.iv-tooltip').length != 0 ) {
             text_el.next('span.iv-tooltip').show();
             setTimeout(function() {
@@ -326,9 +329,11 @@ jQuery.propHooks.disabled = {
     set: function ( iv_select, prop_value ) {
         if ( $(iv_select).is_ivSelect() ) {
             if ( prop_value ) {
-                $(iv_select).iv_textEl().css('background-color', '#f1f1f1');
+                $( iv_select ).iv_findElement( iv_elements.view_el ).css( 'background-color', '#f8f8f8' );
+                $( iv_select ).iv_findElement( iv_elements.search_el ).prop( 'disabled', true );
             } else {
-                $(iv_select).iv_textEl().css('background-color', 'white');
+                $( iv_select ).iv_findElement( iv_elements.view_el ).css('background-color', 'unset');
+                $( iv_select ).iv_findElement( iv_elements.search_el ).prop( 'disabled', false );
             }
         }
     }
@@ -443,7 +448,7 @@ $(document).on('click', function(e) {
 });
 
 function addIvItem(item_text, item_val) {
-    if ( item_text == '' ) return '&nbsp;';
+    if ( item_text == '' ) return '';
     //add container node
     var container_node = $('<div/>').attr({
         class: 'iv-selected-item'
@@ -518,7 +523,6 @@ function addIvItem(item_text, item_val) {
         iv_text_el.empty().append( value_text );
         iv_text_el.append( iv_search_el );
         if ( ! value || value.length === 0 ) {
-            iv_search_el.width( 'auto' );
             iv_search_el.attr( 'placeholder', iv_search_el[0].dataset.iv_placeholder );
         } else {
             iv_search_el.css( 'width', '0.75em' );
@@ -775,6 +779,9 @@ $.fn.extend({
             if (select_el[0].tagName != 'SELECT') return;
             if (select_el.hasClass('iv-select-value')) return;
 
+            var v_disabled = false;
+            if ( select_el.prop('disabled') ) v_disabled = true;
+
             //add main element
             var iv_select = $('<div/>');
             iv_select.addClass( 'iv-select' );
@@ -787,8 +794,12 @@ $.fn.extend({
             var view_element = $('<div/>');
             view_element.addClass( 'iv-select-view' );
             view_element.addClass( iv_settings.view_el.classes );
+            view_element.css( iv_settings.view_el.styles );
             view_element.css( 'style', args.view_el_style );
             view_element.addClass( args.view_el_class );
+            if ( v_disabled ) {
+                view_element.css( 'background-color', '#f8f8f8' );
+            }
 
             //add value element
             var attributes = select_el[0].attributes;
@@ -815,7 +826,7 @@ $.fn.extend({
                     existing_class.replace( re, '' );
                     iv_select.addClass( bar_class );
                     iv_select.addClass( 'iv-select-topbar' );
-                    view_element.removeClass( 'w3-padding-small' );
+                    view_element.css( {padding: 'unset'} );
                     iv_select.css( 'position', 'static' );
                 }
                 switch ( args.keep_existing_class ) {
@@ -848,6 +859,9 @@ $.fn.extend({
                 search_element.addClass( 'iv-select-search' );
                 search_element.addClass( iv_settings.search_el.classes );
                 search_element.css( iv_settings.search_el.styles );
+                if ( v_disabled ) {
+                    search_element.prop( 'disabled', true );
+                }
                 text_element.append( search_element );
             } else {
                 text_element.css({width: '100%'});
