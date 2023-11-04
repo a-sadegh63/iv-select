@@ -60,14 +60,14 @@ const iv_settings = {
         styles: {
             padding:'2px 8px'
         },
-        classes: 'w3-cell'
     },
     delete_button: {
         styles: {
             padding:'2px 8px',
-            'font-weight': 900
+            'font-weight': 900,
+            float: 'inline-end'
         },
-        classes: 'w3-hover-black w3-round w3-red w3-button w3-cell'
+        classes: 'w3-hover-black w3-round w3-red w3-button'
     },
     options_container_el: {
         styles: {
@@ -338,6 +338,10 @@ jQuery.propHooks.disabled = {
         }
     }
 };
+
+$(document).on( 'mouseenter', '.iv-select-options option', function(e) {
+    $(this).attr( 'title', $(this).text() );
+});
 
 $(document).on('click', '.iv-select-options option', function(e) {
     var target_el = $(e.target);
