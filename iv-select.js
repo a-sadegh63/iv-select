@@ -296,8 +296,8 @@ function ivDropOptionsDown( main_el ) {
     }
 }
 
-const ivSelectOninvalid = (iv_value_dom, err_message) => {
-    var text_el = $(iv_value_dom).iv_findElement( iv_elements.view_el );
+$.fn.ivSelectOninvalid = function(err_message) {
+    var text_el = $(this).iv_findElement( iv_elements.view_el );
     text_el.attr( 'title', err_message );
     var view_width = text_el.outerWidth();
     if ( text_el.next('span.iv-tooltip').length != 0 ) {
@@ -308,13 +308,13 @@ const ivSelectOninvalid = (iv_value_dom, err_message) => {
           'font-size:13px;padding:18px;width:' + view_width + 'px;min-width:250px"' + 
           ' class="iv-tooltip w3-round-large">' + err_message + '</span>') 
     );
-    $(iv_value_dom).on( 'invalid', function () {
-        var text_el = $(iv_value_dom).iv_findElement( iv_elements.view_el );
+    $(this).on( 'invalid', function () {
+        var text_el = $(this).iv_findElement( iv_elements.view_el );
         if ( text_el.next('span.iv-tooltip').length != 0 ) {
             text_el.next('span.iv-tooltip').show();
             setTimeout(function() {
                 text_el.next('span.iv-tooltip').hide();
-            }, 5000);    
+            }, 3000);    
         }
         if ( text_el[0].getBoundingClientRect().bottom > window.innerHeight ) {
             text_el[0].scrollIntoView(false);
@@ -323,7 +323,7 @@ const ivSelectOninvalid = (iv_value_dom, err_message) => {
             text_el[0].scrollIntoView();
         } 
     });
-}
+};
 
 jQuery.propHooks.disabled = {
     set: function ( iv_select, prop_value ) {
@@ -651,8 +651,35 @@ $.fn.extend({
         return this.prevAll('div.iv-select-text');
     },
     iv_isIvConstruct: function() {
-        if (this.hasClass('iv-select-search')) return true;
-        return false;
+        switch ( true ) {
+            case this.hasClass('iv-select') :
+            case this.hasClass('iv-select-view') :
+            case this.hasClass('iv-select-text') :
+            case this.hasClass('iv-select-search') :
+            case this.hasClass('iv-select-value') :
+            case this.hasClass('iv-select-options') :
+            case this.hasClass('iv-selected-item') :
+            case this.hasClass('iv-del-button') :
+            case this.hasClass('iv-selected-item-text') :
+            case this.parent().hasClass('iv-select-options') :
+                return true;
+            default :
+                return false;
+        }
+    },
+    iv_getVal: function () {
+        if ( this.iv_isIvConstruct() ) {
+            var value_el = this.iv_findElement( iv_elements.value_el );
+            return value_el.val();
+        }
+        return undefined;
+    },
+    iv_setVal: function ( value ) {
+        if ( this.iv_isIvConstruct() ) {
+            var value_el = this.iv_findElement( iv_elements.value_el );
+            value_el.val( value );
+        }
+        return undefined;
     },
     iv_findElement: 
     /**
@@ -916,7 +943,7 @@ $.fn.extend({
             //set value of the iv-select
             var first_value = select_el.val();
             if ( select_el.data('iv-init-value') !== undefined ) {
-                if (select_el.prop('multiple') === false) {
+                if ( select_el.prop('multiple') === false ) {
                     first_value = select_el.data('iv-init-value');
                 } else {
                     first_value = select_el.data('iv-init-value').split('|');
