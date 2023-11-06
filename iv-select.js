@@ -296,35 +296,6 @@ function ivDropOptionsDown( main_el ) {
     }
 }
 
-$.fn.ivSelectOninvalid = function(err_message) {
-    var text_el = $(this).iv_findElement( iv_elements.view_el );
-    text_el.attr( 'title', err_message );
-    var view_width = text_el.outerWidth();
-    if ( text_el.next('span.iv-tooltip').length != 0 ) {
-        text_el.next('span.iv-tooltip').remove();
-    }
-    text_el.after( 
-        $('<span style="position:absolute;background-color:rgb(30, 29, 34);color:white;' + 
-          'font-size:13px;padding:18px;width:' + view_width + 'px;min-width:250px"' + 
-          ' class="iv-tooltip w3-round-large">' + err_message + '</span>') 
-    );
-    $(this).on( 'invalid', function () {
-        var text_el = $(this).iv_findElement( iv_elements.view_el );
-        if ( text_el.next('span.iv-tooltip').length != 0 ) {
-            text_el.next('span.iv-tooltip').show();
-            setTimeout(function() {
-                text_el.next('span.iv-tooltip').hide();
-            }, 3000);    
-        }
-        if ( text_el[0].getBoundingClientRect().bottom > window.innerHeight ) {
-            text_el[0].scrollIntoView(false);
-        }
-        if ( text_el[0].getBoundingClientRect().top < 0 ) {
-            text_el[0].scrollIntoView();
-        } 
-    });
-};
-
 jQuery.propHooks.disabled = {
     set: function ( iv_select, prop_value ) {
         if ( $(iv_select).is_ivSelect() ) {
@@ -666,6 +637,46 @@ $.fn.extend({
             default :
                 return false;
         }
+    },
+    iv_setInvalid: function( err_message ) {
+        if ( ! this.iv_isIvConstruct ) return;
+        var text_el = this.iv_findElement( iv_elements.view_el );
+        text_el.attr( 'title', err_message );
+        var view_width = text_el.outerWidth();
+        if ( text_el.next('span.iv-tooltip').length != 0 ) {
+            text_el.next('span.iv-tooltip').remove();
+        }
+        text_el.after( 
+            $('<span style="position:absolute;background-color:rgb(30, 29, 34);color:white;' + 
+              'font-size:13px;padding:18px;width:' + view_width + 'px;min-width:250px"' + 
+              ' class="iv-tooltip w3-round-large">' + err_message + '</span>') 
+        );
+        this.on( 'invalid', function () {
+            var text_el = $(this).iv_findElement( iv_elements.view_el );
+            if ( text_el.next('span.iv-tooltip').length != 0 ) {
+                text_el.next('span.iv-tooltip').show();
+                setTimeout(function() {
+                    text_el.next('span.iv-tooltip').hide();
+                }, 3000);    
+            }
+            if ( text_el[0].getBoundingClientRect().bottom > window.innerHeight ) {
+                text_el[0].scrollIntoView(false);
+            }
+            if ( text_el[0].getBoundingClientRect().top < 0 ) {
+                text_el[0].scrollIntoView();
+            } 
+        });
+    },
+    iv_clearInvalid: function() {
+        this.each( function() {
+            var target_el = $(this).iv_findElement( iv_elements.value_el );
+            if ( target_el != false ) {
+                target_el[0].setCustomValidity('');
+            }
+            if ( typeof this.setCustomValidity !== "undefined" ) { 
+                this.setCustomValidity('');
+            }
+        });
     },
     iv_getVal: function () {
         if ( this.iv_isIvConstruct() ) {
