@@ -844,21 +844,10 @@ $.fn.extend({
             }
 
             //add value element
-            var attributes = select_el[0].attributes;
-            var value_element = $('<select>');
-            $.each( attributes, function( index, attribute ) {
-                var attr_name = attribute.name;
-                var attr_value = attribute.nodeValue;
-                value_element.attr({ [attr_name]: attr_value });
-            });
+            var value_element = select_el.clone( true, true );
             value_element.css( iv_settings.value_el.styles );
             value_element.addClass( iv_settings.value_el.classes );
             value_element.addClass( args.value_el_class );
-            var multiple;
-            if (select_el.prop('multiple') === true) multiple = 'multiple';
-            value_element.attr({
-                multiple: multiple
-            });
 
             //Determining the new iv-select element for existing class in the select element
             var existing_class = select_el.attr('class');
