@@ -378,6 +378,7 @@ $(document).on('keyup', 'input.iv-select-search', function(e) {
     }
     target.width( target.prop('scrollWidth') );
     var search = target.val();
+    if ( search == '' ) return;
     var options = target.iv_findElement( iv_elements.options_el );
     var options_container = target.iv_findElement( iv_elements.options_container_el );
     options.removeClass('w3-border-bottom');
