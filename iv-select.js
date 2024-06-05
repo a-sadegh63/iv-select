@@ -489,7 +489,7 @@ function addIvItem(item_text, item_val) {
                 }
             }
         });
-        if ( value_text.length === 0 ) value_text = '&nbsp;';
+        // if ( value_text.length === 0 ) value_text = '&nbsp;';
         if ( this.attr('required') ) {
             if ( value == '' ) {
                 this[0].setCustomValidity('Please fill out this field');
