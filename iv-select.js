@@ -355,9 +355,12 @@ $(document).on('click', '.iv-del-button', function(e) {
     if ( iv_value_el.prop('multiple') === true ) {
         var current_value = iv_value_el.val();
         if (Array.isArray(current_value)) {
-            const index = current_value.indexOf(del_item);
+            console.log(current_value)
+            console.log(del_item)
+            const index = current_value.indexOf( del_item.toString() );
             if (index != -1) {
                 current_value.splice(index, 1);
+                console.log(current_value)
                 iv_value_el.val( current_value )
             }
         } else {
