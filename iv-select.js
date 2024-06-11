@@ -355,12 +355,9 @@ $(document).on('click', '.iv-del-button', function(e) {
     if ( iv_value_el.prop('multiple') === true ) {
         var current_value = iv_value_el.val();
         if (Array.isArray(current_value)) {
-            console.log(current_value)
-            console.log(del_item)
             const index = current_value.indexOf( del_item.toString() );
             if (index != -1) {
                 current_value.splice(index, 1);
-                console.log(current_value)
                 iv_value_el.val( current_value )
             }
         } else {
@@ -947,10 +944,15 @@ $.fn.extend({
             //set value of the iv-select
             var first_value = select_el.val();
             if ( select_el.data('iv-init-value') !== undefined ) {
+                let init_value = select_el.data('iv-init-value').toString();
                 if ( select_el.prop('multiple') === false ) {
-                    first_value = select_el.data('iv-init-value');
+                    first_value = init_value;
                 } else {
-                    first_value = select_el.data('iv-init-value').split('|');
+                    if ( init_value.includes('|') ) {
+                        first_value = init_value.split('|');
+                    } else {
+                        first_value = init_value;
+                    }
                 }
             }
             if ( first_value ) {
