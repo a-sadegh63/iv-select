@@ -511,27 +511,40 @@ function addIvItem(item_text, item_val) {
 })(jQuery);
 
 jQuery.fn.extend({
-    iv_updateOptions: 
+    iv_updateOptions:
     /**
-     * With this function you able to replace iv-select options with new options
-     * @param {object} new_options jQuery object from new option elements
+     * این تابع مقادیر iv-select را با گزینه‌های جدید جایگزین می‌کند
+     * @param {object} new_options یک آبجکت شامل مقادیر جدید برای گزینه‌ها
      */
-    function( new_options ) {
-        var options_container = this.iv_findElement( iv_elements.options_container_el );
-        if ( options_container !== false ) {
-            options_container.empty().append(new_options);
-            //add value null option
-            if ( options_container.children().first().val() != '' ) {
+    function(new_options) {
+        var options_container = this.iv_findElement(iv_elements.options_container_el);
+        if (options_container !== false) {
+            // پاک‌سازی و افزودن گزینه‌های جدید
+            options_container.empty();
+            
+            // افزودن گزینه‌ها بر اساس آبجکت ورودی
+            jQuery.each(new_options, function(key, value) {
                 options_container.append(
+                    jQuery('<option/>').attr('value', key).text(value)
+                );
+            });
+            
+            // افزودن گزینه null اگر اولین گزینه وجود ندارد
+            if (options_container.children().first().val() !== '') {
+                options_container.prepend(
                     jQuery('<option/>').attr({
                         class: 'w3-hide',
                         value: ''
-                    })
+                    }).text('انتخاب کنید')
                 );
             }
-            options_container.children('option').each( function () {
-                jQuery(this).addClass( iv_settings.options_el.classes );
-            });    
+            
+            // افزودن کلاس‌ها به گزینه‌ها
+            options_container.children('option').each(function() {
+                jQuery(this).addClass(iv_settings.options_el.classes);
+            });
+            var old_val = this.val();
+            this.val(old_val);
         }
     },
     iv_getPossibleValues: 
