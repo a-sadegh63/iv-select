@@ -682,16 +682,22 @@ jQuery.fn.extend({
         });
     },
     iv_clearInvalid: function() {
-        this.each( function() {
-            var target_el = jQuery(this).iv_findElement( iv_elements.value_el );
-            if ( target_el != false ) {
+        this.each(function() {
+            var target_el = jQuery(this).iv_findElement(iv_elements.value_el);
+            if (target_el != false) {
                 target_el[0].setCustomValidity('');
             }
-            if ( typeof this.setCustomValidity !== "undefined" ) { 
+            // check if element is a radio box
+            if (this.type === 'radio') {
+                var groupName = this.name;
+                $('input[name="' + groupName + '"]').each(function() {
+                    this.setCustomValidity('');
+                });
+            } else if (typeof this.setCustomValidity !== "undefined") { 
                 this.setCustomValidity('');
             }
         });
-    },
+    },    
     iv_getVal: function () {
         if ( this.iv_isIvConstruct() ) {
             var value_el = this.iv_findElement( iv_elements.value_el );
