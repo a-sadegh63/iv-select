@@ -32,32 +32,58 @@ class ExcelFilter {
         }
 
         this.currentTheme = this.themeManager.themes[this.settings.theme] || this.themeManager.themes.light;
+        this.originalHeaderRow = null;
+        this.filterRow = null;
         this.filters = new Map();
         this.activeMenu = null;
         this.menuZIndex = 999999;
+        this.resultMessage = null;
         
         this.init();
     }
 
     init() {
+        this.saveOriginalHeader();
         this.ensureTableStructure();
-        this.replaceHeaderWithFilter();
+        this.createFilterRow();
+        this.applyThemeToTable();
         this.bindEvents();
+        this.applyFilters();
+    }
+
+    saveOriginalHeader() {
+        // پیدا کردن یا ایجاد thead
+        let thead = this.table.querySelector('thead');
+        if (!thead) {
+            thead = document.createElement('thead');
+            this.table.prepend(thead);
+        }
+
+        // پیدا کردن یا ایجاد ردیف عنوان
+        let headerRow = thead.querySelector('tr');
+        if (!headerRow) {
+            // اگر ردیف عنوان وجود نداشت، از اولین ردیف جدول استفاده کن
+            const firstRow = this.table.querySelector('tbody tr');
+            if (firstRow) {
+                headerRow = document.createElement('tr');
+                const cells = firstRow.querySelectorAll('td');
+                cells.forEach((cell, index) => {
+                    const th = document.createElement('th');
+                    th.textContent = `ستون ${index + 1}`;
+                    headerRow.appendChild(th);
+                });
+                thead.appendChild(headerRow);
+            }
+        }
+
+        // ذخیره ردیف عنوان اصلی
+        this.originalHeaderRow = headerRow;
+        
+        // مخفی کردن ردیف عنوان اصلی
+        this.originalHeaderRow.style.display = 'none';
     }
 
     ensureTableStructure() {
-        // اطمینان از وجود thead و tbody
-        if (!this.table.querySelector('thead')) {
-            const thead = document.createElement('thead');
-            const firstRow = this.table.querySelector('tr');
-            if (firstRow) {
-                const newRow = firstRow.cloneNode(true);
-                firstRow.remove();
-                thead.appendChild(newRow);
-                this.table.prepend(thead);
-            }
-        }
-        
         if (!this.table.querySelector('tbody')) {
             const tbody = document.createElement('tbody');
             const rows = this.table.querySelectorAll('tr:not(thead tr)');
@@ -67,26 +93,26 @@ class ExcelFilter {
         }
     }
 
-    replaceHeaderWithFilter() {
+    createFilterRow() {
         const thead = this.table.querySelector('thead');
-        if (!thead) return;
-
-        // ذخیره عنوان‌های ستون‌ها
-        const headerRow = thead.querySelector('tr');
-        if (!headerRow) return;
-
-        const headers = headerRow.querySelectorAll('th');
-        const columnNames = Array.from(headers).map(th => th.textContent.trim());
         
-        // ایجاد ردیف جدید با فیلترها
-        const filterRow = document.createElement('tr');
-        filterRow.className = 'excel-filter-header';
+        // حذف ردیف فیلتر قبلی اگر وجود دارد
+        if (this.filterRow && this.filterRow.parentNode) {
+            this.filterRow.remove();
+        }
+        
+        // ایجاد ردیف جدید برای فیلترها
+        this.filterRow = document.createElement('tr');
+        this.filterRow.className = 'excel-filter-header';
+        
+        const headers = this.originalHeaderRow.querySelectorAll('th');
         
         headers.forEach((th, index) => {
+            const columnName = th.textContent.trim();
             const td = document.createElement('td');
             td.className = 'excel-filter-cell';
             td.setAttribute('data-column-index', index);
-            td.setAttribute('data-column-name', columnNames[index]);
+            td.setAttribute('data-column-name', columnName);
             td.style.cssText = `
                 padding: 8px 10px;
                 background: ${this.currentTheme.bg};
@@ -95,15 +121,70 @@ class ExcelFilter {
                 min-width: 80px;
             `;
             
-            const filterButton = this.createFilterButton(columnNames[index], `column_${index}`, index);
+            const filterButton = this.createFilterButton(columnName, `column_${index}`, index);
             td.appendChild(filterButton);
             
-            filterRow.appendChild(td);
+            this.filterRow.appendChild(td);
         });
         
-        // پاک کردن thead و اضافه کردن ردیف فیلتر
-        thead.innerHTML = '';
-        thead.appendChild(filterRow);
+        thead.appendChild(this.filterRow);
+    }
+
+    applyThemeToTable() {
+        // استایل خود جدول
+        this.table.style.cssText = `
+            width: 100%;
+            border-collapse: collapse;
+            background: ${this.currentTheme.bg};
+            color: ${this.currentTheme.text};
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: ${this.currentTheme.shadow};
+        `;
+
+        // استایل ردیف عنوان اصلی (مخفی)
+        if (this.originalHeaderRow) {
+            const headers = this.originalHeaderRow.querySelectorAll('th');
+            headers.forEach(th => {
+                th.style.cssText = `
+                    padding: 12px;
+                    text-align: right;
+                    font-weight: 600;
+                    font-size: 13px;
+                    color: ${this.currentTheme.text};
+                    background: ${this.currentTheme.hover};
+                    border-bottom: 2px solid ${this.currentTheme.border};
+                `;
+            });
+        }
+
+        // استایل سلول‌های بدنه جدول
+        const rows = this.table.querySelectorAll('tbody tr');
+        rows.forEach((row) => {
+            // حذف event listenerهای قبلی با clone
+            const newRow = row.cloneNode(true);
+            row.parentNode.replaceChild(newRow, row);
+            
+            newRow.style.background = this.currentTheme.bg;
+            
+            const cells = newRow.querySelectorAll('td');
+            cells.forEach(cell => {
+                cell.style.cssText = `
+                    padding: 10px 12px;
+                    border-bottom: 1px solid ${this.currentTheme.border}30;
+                    color: ${this.currentTheme.text};
+                `;
+            });
+
+            // اضافه کردن event listenerهای جدید
+            newRow.addEventListener('mouseenter', () => {
+                newRow.style.background = this.currentTheme.hover;
+            });
+            newRow.addEventListener('mouseleave', () => {
+                newRow.style.background = this.currentTheme.bg;
+            });
+        });
     }
 
     createFilterButton(columnName, fieldName, columnIndex) {
@@ -204,6 +285,10 @@ class ExcelFilter {
         
         return container;
     }
+
+    // ... بقیه متدها مثل showFilterMenu, createMenuElement, createFilterMenuItem, filterMenuItems, 
+    // getUniqueColumnValues, updateFilterButtonState, applyFilters, showFilterResult, 
+    // clearAllFilters, closeAllMenus, bindEvents مثل قبل هستند ...
 
     showFilterMenu(button, columnIndex, fieldName, columnName) {
         this.closeAllMenus();
@@ -682,9 +767,12 @@ class ExcelFilter {
     }
 
     showFilterResult(visible, total) {
-        const oldMessage = this.table.parentElement?.querySelector('.excel-filter-result');
-        if (oldMessage) oldMessage.remove();
+        // حذف پیغام قبلی
+        if (this.resultMessage && this.resultMessage.parentNode) {
+            this.resultMessage.remove();
+        }
         
+        // اگر فیلتری فعال نیست، پیغام را نشان نده
         if (this.filters.size === 0) return;
         
         let hasActiveFilter = false;
@@ -697,6 +785,7 @@ class ExcelFilter {
         
         if (!hasActiveFilter) return;
         
+        // ایجاد پیغام جدید
         const message = document.createElement('div');
         message.className = 'excel-filter-result';
         message.style.cssText = `
@@ -742,7 +831,9 @@ class ExcelFilter {
         message.appendChild(countSpan);
         message.appendChild(clearBtn);
         
-        this.table.parentElement?.appendChild(message);
+        // اضافه کردن پیغام بعد از جدول
+        this.table.parentNode.insertBefore(message, this.table.nextSibling);
+        this.resultMessage = message;
     }
 
     clearAllFilters() {
@@ -764,8 +855,11 @@ class ExcelFilter {
             row.style.display = '';
         });
         
-        const message = this.table.parentElement?.querySelector('.excel-filter-result');
-        if (message) message.remove();
+        // حذف پیغام
+        if (this.resultMessage && this.resultMessage.parentNode) {
+            this.resultMessage.remove();
+            this.resultMessage = null;
+        }
     }
 
     closeAllMenus() {
@@ -834,18 +928,30 @@ class ExcelFilter {
     }
 
     destroy() {
-        const filterHeader = this.table.querySelector('.excel-filter-header');
-        if (filterHeader) filterHeader.remove();
+        // نمایش دوباره ردیف عنوان اصلی
+        if (this.originalHeaderRow) {
+            this.originalHeaderRow.style.display = '';
+        }
         
+        // حذف ردیف فیلتر
+        if (this.filterRow && this.filterRow.parentNode) {
+            this.filterRow.remove();
+        }
+        
+        // پاک کردن فیلترها
         this.filters.clear();
         this.closeAllMenus();
         
+        // نمایش همه ردیف‌ها
         this.table.querySelectorAll('tbody tr').forEach(row => {
             row.style.display = '';
         });
         
-        const message = this.table.parentElement?.querySelector('.excel-filter-result');
-        if (message) message.remove();
+        // حذف پیغام
+        if (this.resultMessage && this.resultMessage.parentNode) {
+            this.resultMessage.remove();
+            this.resultMessage = null;
+        }
     }
 }
 

@@ -3,87 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Excel Filter - فیلتر پیشرفته برای جداول</title>
+    <title>Excel Filter - دمو</title>
     <style>
         body {
-            font-family: system-ui, 'Segoe UI', Roboto, sans-serif;
+            font-family: system-ui, sans-serif;
             max-width: 1200px;
             margin: 0 auto;
             padding: 30px 20px;
             background: #fafafa;
-            color: #333;
         }
 
-        h1 {
-            font-size: 24px;
-            margin-bottom: 10px;
-            color: #0f172a;
-        }
-
-        .description {
-            background: #f8fafc;
-            border: 1px solid #e2e8f0;
-            border-radius: 8px;
-            padding: 16px;
-            margin-bottom: 30px;
-            color: #475569;
-            font-size: 14px;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            background: white;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            border-radius: 8px;
-            overflow: hidden;
-        }
-
-        th, .excel-filter-cell {
-            padding: 12px;
-            text-align: right;
-            font-weight: 600;
-            font-size: 13px;
-            border-bottom: 2px solid #e2e8f0;
-        }
-
-        td {
-            padding: 10px 12px;
-            border-bottom: 1px solid #e2e8f0;
-            font-size: 13px;
-            color: #334155;
-        }
-
-        tr:hover td {
-            background: #f1f5f9;
-        }
-
-        .card {
-            background: white;
-            border-radius: 12px;
-            padding: 24px;
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
-            margin-bottom: 30px;
-        }
-
-        .features {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            margin-top: 20px;
-        }
-
-        .feature {
-            background: #f8fafc;
-            padding: 12px;
-            border-radius: 6px;
-            font-size: 13px;
-        }
-
-        .feature strong {
-            color: #2563eb;
-        }
-
+        h1 { color: #0f172a; }
+        
         .controls {
             margin-top: 30px;
             display: flex;
@@ -100,228 +31,39 @@
             transition: all 0.2s;
         }
 
-        .btn-primary {
-            background: #3b82f6;
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background: #2563eb;
-        }
-
-        .btn-danger {
-            background: #ef4444;
-            color: white;
-        }
-
-        .btn-danger:hover {
-            background: #dc2626;
-        }
-
-        .btn-success {
-            background: #10b981;
-            color: white;
-        }
-
-        .btn-success:hover {
-            background: #059669;
-        }
-
-        .btn-warning {
-            background: #f59e0b;
-            color: white;
-        }
-
-        .btn-warning:hover {
-            background: #d97706;
-        }
+        .btn-primary { background: #3b82f6; color: white; }
+        .btn-primary:hover { background: #2563eb; }
+        .btn-danger { background: #ef4444; color: white; }
+        .btn-danger:hover { background: #dc2626; }
     </style>
 </head>
 <body>
-    <h1>📊 Excel-like Filter برای جداول</h1>
+    <h1>📊 Excel Filter</h1>
     
-    <div class="description">
-        ⚡ فیلتر پیشرفته مثل اکسل - عنوان جدول با دکمه‌های فیلتر جایگزین شده است
-        <br>
-        ✓ انتخاب چندگانه ✓ جستجوی زنده ✓ انتخاب همه/پاک کردن همه ✓ نمایش تعداد آیتم‌ها
-    </div>
-
-    <div class="card">
-        <h3 style="margin-top: 0; margin-bottom: 20px;">📋 لیست محصولات</h3>
-        
-        <table id="products-table" class="filterable-table">
-            <thead>
-                <tr>
-                    <th>شناسه</th>
-                    <th>نام محصول</th>
-                    <th>دسته‌بندی</th>
-                    <th>قیمت</th>
-                    <th>موجودی</th>
-                    <th>وضعیت</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>1</td>
-                    <td>لپ‌تاپ ایسوس</td>
-                    <td>الکترونیک</td>
-                    <td>15,000,000</td>
-                    <td>12</td>
-                    <td>موجود</td>
-                </tr>
-                <tr>
-                    <td>2</td>
-                    <td>موبایل سامسونگ</td>
-                    <td>الکترونیک</td>
-                    <td>12,000,000</td>
-                    <td>8</td>
-                    <td>موجود</td>
-                </tr>
-                <tr>
-                    <td>3</td>
-                    <td>هدفون بیسیم</td>
-                    <td>الکترونیک</td>
-                    <td>2,500,000</td>
-                    <td>0</td>
-                    <td>ناموجود</td>
-                </tr>
-                <tr>
-                    <td>4</td>
-                    <td>میز اداری</td>
-                    <td>مبلمان</td>
-                    <td>3,200,000</td>
-                    <td>5</td>
-                    <td>موجود</td>
-                </tr>
-                <tr>
-                    <td>5</td>
-                    <td>صندلی گیمینگ</td>
-                    <td>مبلمان</td>
-                    <td>4,500,000</td>
-                    <td>3</td>
-                    <td>موجود</td>
-                </tr>
-                <tr>
-                    <td>6</td>
-                    <td>کتاب مدیریت</td>
-                    <td>کتاب</td>
-                    <td>85,000</td>
-                    <td>25</td>
-                    <td>موجود</td>
-                </tr>
-                <tr>
-                    <td>7</td>
-                    <td>ماوس بیسیم</td>
-                    <td>الکترونیک</td>
-                    <td>850,000</td>
-                    <td>0</td>
-                    <td>ناموجود</td>
-                </tr>
-                <tr>
-                    <td>8</td>
-                    <td>کیبورد مکانیکی</td>
-                    <td>الکترونیک</td>
-                    <td>1,800,000</td>
-                    <td>7</td>
-                    <td>موجود</td>
-                </tr>
-                <tr>
-                    <td>9</td>
-                    <td>مانیتور ال‌جی</td>
-                    <td>الکترونیک</td>
-                    <td>8,500,000</td>
-                    <td>4</td>
-                    <td>موجود</td>
-                </tr>
-                <tr>
-                    <td>10</td>
-                    <td>کتاب برنامه‌نویسی</td>
-                    <td>کتاب</td>
-                    <td>120,000</td>
-                    <td>15</td>
-                    <td>موجود</td>
-                </tr>
-                <tr>
-                    <td>11</td>
-                    <td>فلش ۳۲ گیگ</td>
-                    <td>الکترونیک</td>
-                    <td>320,000</td>
-                    <td>0</td>
-                    <td>ناموجود</td>
-                </tr>
-                <tr>
-                    <td>12</td>
-                    <td>پاوربانک</td>
-                    <td>الکترونیک</td>
-                    <td>950,000</td>
-                    <td>6</td>
-                    <td>موجود</td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-
-    <div class="features">
-        <div class="feature">
-            <strong>✓ فیلتر چندگانه</strong>
-            <br>
-            انتخاب چندین مقدار از هر ستون
-        </div>
-        <div class="feature">
-            <strong>🔍 جستجوی زنده</strong>
-            <br>
-            فیلتر سریع آیتم‌های منو
-        </div>
-        <div class="feature">
-            <strong>📊 نمایش تعداد</strong>
-            <br>
-            تعداد آیتم‌های انتخاب شده
-        </div>
-        <div class="feature">
-            <strong>🎨 تم‌های مختلف</strong>
-            <br>
-            پشتیبانی از تم‌های روشن/تیره
-        </div>
-        <div class="feature">
-            <strong>⚡ بدون وابستگی</strong>
-            <br>
-            Vanilla JS خالص
-        </div>
-        <div class="feature">
-            <strong>🔄 تعامل کامل</strong>
-            <br>
-            شبیه فیلترهای اکسل
-        </div>
-    </div>
+    <table id="products-table">
+        <thead>
+            <tr>
+                <th>شناسه</th>
+                <th>نام محصول</th>
+                <th>دسته‌بندی</th>
+                <th>قیمت</th>
+                <th>موجودی</th>
+                <th>وضعیت</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr><td>1</td><td>لپ‌تاپ ایسوس</td><td>الکترونیک</td><td>15,000,000</td><td>12</td><td>موجود</td></tr>
+            <tr><td>2</td><td>موبایل سامسونگ</td><td>الکترونیک</td><td>12,000,000</td><td>8</td><td>موجود</td></tr>
+            <tr><td>3</td><td>هدفون بیسیم</td><td>الکترونیک</td><td>2,500,000</td><td>0</td><td>ناموجود</td></tr>
+            <tr><td>4</td><td>میز اداری</td><td>مبلمان</td><td>3,200,000</td><td>5</td><td>موجود</td></tr>
+            <tr><td>5</td><td>صندلی گیمینگ</td><td>مبلمان</td><td>4,500,000</td><td>3</td><td>موجود</td></tr>
+        </tbody>
+    </table>
 
     <div class="controls">
-        <button id="btn-clear-filters" class="btn btn-danger">
-            🧹 پاک کردن همه فیلترها
-        </button>
-        
-        <button id="btn-change-theme-light" class="btn btn-primary">
-            🌞 تم روشن
-        </button>
-        
-        <button id="btn-change-theme-dark" class="btn btn-primary">
-            🌙 تم تیره
-        </button>
-        
-        <button id="btn-change-theme-modern" class="btn btn-success">
-            ✨ تم مدرن
-        </button>
-
-        <button id="btn-change-theme-ocean" class="btn btn-warning">
-            🌊 تم اقیانوس
-        </button>
-
-        <button id="btn-change-theme-midnight" class="btn btn-primary" style="background: #4f46e5;">
-            🌃 تم نیمه‌شب
-        </button>
-
-        <button id="btn-change-theme-forest" class="btn btn-success" style="background: #22c55e;">
-            🌳 تم جنگل
-        </button>
+        <button id="btn-clear" class="btn btn-danger">🧹 پاک کردن فیلترها</button>
+        <button id="btn-theme-light" class="btn btn-primary">🌞 روشن</button>
+        <button id="btn-theme-dark" class="btn btn-primary">🌙 تیره</button>
     </div>
 
     <script type="module">
@@ -329,101 +71,20 @@
         import { ExcelFilter } from '../excel-filter.js';
 
         let filter;
-        let currentTheme = 'light';
 
-        // ذخیره عنوان‌های اصلی جدول
-        const originalHeaders = [
-            'شناسه',
-            'نام محصول',
-            'دسته‌بندی',
-            'قیمت',
-            'موجودی',
-            'وضعیت'
-        ];
-
-        // بازگرداندن عنوان‌های اصلی به جدول
-        function restoreOriginalHeaders() {
-            const table = document.querySelector('#products-table');
-            const thead = table.querySelector('thead');
-            
-            // پاک کردن thead
-            thead.innerHTML = '';
-            
-            // ایجاد ردیف عنوان جدید
-            const headerRow = document.createElement('tr');
-            originalHeaders.forEach(headerText => {
-                const th = document.createElement('th');
-                th.textContent = headerText;
-                headerRow.appendChild(th);
+        function initFilter(theme) {
+            if (filter) filter.destroy();
+            filter = new ExcelFilter(document.querySelector('#products-table'), {
+                theme: theme,
+                themeManager: IvSelectThemeManager
             });
-            
-            thead.appendChild(headerRow);
         }
 
-        // مقداردهی اولیه فیلتر
-        function initFilter(theme = 'light') {
-            if (filter) {
-                filter.destroy();
-            }
-            
-            // بازگرداندن عنوان‌های اصلی
-            restoreOriginalHeaders();
-            
-            // ایجاد فیلتر جدید
-            filter = new ExcelFilter(
-                document.querySelector('#products-table'),
-                {
-                    theme: theme,
-                    placeholder: 'فیلتر...',
-                    searchable: true,
-                    showSelectAll: true,
-                    showClearButton: true,
-                    showItemCount: true,
-                    maxHeight: '250px',
-                    width: '260px',
-                    themeManager: IvSelectThemeManager
-                }
-            );
-            
-            currentTheme = theme;
-            console.log(`✅ Excel Filter initialized with theme: ${theme}`);
-        }
+        initFilter('light');
 
-        // مقداردهی اولیه با تم روشن
-        setTimeout(() => {
-            initFilter('light');
-        }, 100);
-
-        // کنترل‌ها
-        document.getElementById('btn-clear-filters').onclick = () => {
-            if (filter) {
-                filter.clearAllFilters();
-            }
-        };
-
-        document.getElementById('btn-change-theme-light').onclick = () => {
-            initFilter('light');
-        };
-
-        document.getElementById('btn-change-theme-dark').onclick = () => {
-            initFilter('dark');
-        };
-
-        document.getElementById('btn-change-theme-modern').onclick = () => {
-            initFilter('modern');
-        };
-
-        document.getElementById('btn-change-theme-ocean').onclick = () => {
-            initFilter('ocean');
-        };
-
-        document.getElementById('btn-change-theme-midnight').onclick = () => {
-            initFilter('midnight');
-        };
-
-        document.getElementById('btn-change-theme-forest').onclick = () => {
-            initFilter('forest');
-        };
+        document.getElementById('btn-clear').onclick = () => filter.clearAllFilters();
+        document.getElementById('btn-theme-light').onclick = () => initFilter('light');
+        document.getElementById('btn-theme-dark').onclick = () => initFilter('dark');
     </script>
 </body>
 </html>
